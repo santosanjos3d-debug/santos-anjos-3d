@@ -10,9 +10,11 @@ export default function Header() {
       <div className="container py-6 flex items-center justify-between">
         {/* Logo/Branding */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-            <span className="text-background font-bold text-lg">✝</span>
-          </div>
+          <img 
+            src="/images/logo-simplified.png" 
+            alt="Santos Anjos 3D Logo" 
+            className="w-10 h-10 flex-shrink-0"
+          />
           <div>
             <h1 className="text-2xl font-bold text-foreground">Santos Anjos 3D</h1>
             <p className="text-xs text-muted-foreground tracking-wide">ARTE SACRA EM IMPRESSÃO 3D</p>
