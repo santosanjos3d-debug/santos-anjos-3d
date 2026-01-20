@@ -8,15 +8,17 @@ import { X } from 'lucide-react';
 interface ProductModalProps {
   isOpen: boolean;
   product?: {
-    id: string;
+    id: number;
     name: string;
     category: string;
     image: string;
     description: string;
     details: string;
+    price: string;
     sizes?: string[];
   };
   onClose: () => void;
+  onBuyClick?: () => void;
 }
 
 export default function ProductModal({ isOpen, product, onClose }: ProductModalProps) {

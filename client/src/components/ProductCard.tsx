@@ -5,12 +5,14 @@
  */
 
 interface ProductCardProps {
-  id: string;
+  id: number;
   name: string;
   category: string;
   image: string;
   description: string;
-  onClick?: () => void;
+  price: string;
+  onBuyClick?: () => void;
+  onDetailsClick?: () => void;
 }
 
 export default function ProductCard({
@@ -18,15 +20,17 @@ export default function ProductCard({
   category,
   image,
   description,
-  onClick,
+  price,
+  onBuyClick,
+  onDetailsClick,
 }: ProductCardProps) {
   return (
-    <div
-      onClick={onClick}
-      className="group cursor-pointer card-minimal overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
-    >
+    <div className="group card-minimal overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
       {/* Image Container */}
-      <div className="relative h-80 overflow-hidden bg-secondary">
+      <div 
+        className="relative h-80 overflow-hidden bg-secondary cursor-pointer"
+        onClick={onDetailsClick}
+      >
         <img
           src={image}
           alt={name}
@@ -46,9 +50,23 @@ export default function ProductCard({
           <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
         </div>
 
-        {/* CTA Button */}
-        <div className="pt-4 border-t border-border/50">
-          <button className="w-full py-2 text-accent font-semibold hover:text-accent/80 transition-colors duration-300 text-sm uppercase tracking-wide">
+        {/* Price */}
+        <div className="pt-2 border-t border-border/50">
+          <p className="text-lg font-bold text-accent">R$ {price}</p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="pt-2 space-y-2">
+          <button 
+            onClick={onBuyClick}
+            className="w-full py-2 bg-accent text-background font-semibold hover:bg-accent/90 transition-colors duration-300 text-sm uppercase tracking-wide rounded"
+          >
+            Comprar Agora
+          </button>
+          <button 
+            onClick={onDetailsClick}
+            className="w-full py-2 text-accent font-semibold hover:text-accent/80 transition-colors duration-300 text-sm uppercase tracking-wide"
+          >
             Ver Detalhes →
           </button>
         </div>
