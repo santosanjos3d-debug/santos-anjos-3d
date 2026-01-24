@@ -27,7 +27,7 @@ const PRODUCTS: Product[] = [
     image: '/images/sagrado-coracao-maria-edited.png',
     description: 'Estatueta de Nossa Senhora de Lourdes em resina branca com detalhes delicados.',
     details: 'Impressão 3D de alta qualidade em resina branca. Cada detalhe foi cuidadosamente capturado para refletir a beleza e serenidade de Nossa Senhora de Lourdes, padroeira dos doentes.',
-    price: '23.46',
+    price: '29.33',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -37,7 +37,7 @@ const PRODUCTS: Product[] = [
     image: '/images/nossa-senhora-lourdes-edited.png',
     description: 'Representação do Sagrado Coração de Maria em resina branca.',
     details: 'Impressão 3D em resina branca de alta qualidade. Captura a devoção e amor do Sagrado Coração de Maria com detalhes precisos e acabamento fino.',
-    price: '32.68',
+    price: '40.85',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -47,7 +47,7 @@ const PRODUCTS: Product[] = [
     image: '/images/santa-hildegarda-bingen-edited.png',
     description: 'Santa Hildegarda de Bingen com palma e livro, símbolo de sabedoria.',
     details: 'Impressão 3D em resina branca. Santa Hildegarda é representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Peça de grande significado espiritual.',
-    price: '32.46',
+    price: '40.58',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -57,7 +57,7 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-francisco-assis-edited.png',
     description: 'Santo Francisco de Assis em pose contemplativa com livro.',
     details: 'Representação tocante de São Francisco em sua postura de contemplação. Impressão em resina branca com detalhes que capturam a serenidade e espiritualidade do santo.',
-    price: '28.08',
+    price: '35.10',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -67,7 +67,7 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-jose-menino-jesus-real-edited.png',
     description: 'São José segurando o Menino Jesus com ternura e proteção.',
     details: 'Representação tocante da relação entre São José e Jesus. Impressão em resina branca com detalhes delicados que refletem o amor e a proteção de São José.',
-    price: '31.50',
+    price: '39.38',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -77,7 +77,7 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-jose-coluna-edited.png',
     description: 'Santo Antônio em coluna alta, representação majestosa e contemplativa.',
     details: 'Impressão 3D em resina branca de Santo Antônio. Representação clássica do santo em sua forma contemplativa. Ideal para nichos e altares que exigem maior altura e presença.',
-    price: '25.94',
+    price: '32.43',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -87,7 +87,7 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'São Bento em representação clássica com cruz e livro.',
     details: 'Impressão 3D em resina branca de São Bento, padroeiro dos beneditinos. Peça com grande valor espiritual e histórico.',
-    price: '31.32',
+    price: '39.15',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -97,7 +97,7 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'São Miguel Arcanjo em tamanho pequeno com espada e escudo.',
     details: 'Impressão 3D em resina branca de São Miguel Arcanjo. Representação do protetor contra o mal, ideal para proteção espiritual.',
-    price: '35.42',
+    price: '44.28',
     sizes: ['Pequeno (170mm)'],
   },
   {
@@ -107,7 +107,7 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'São Miguel Arcanjo em tamanho médio com espada e escudo.',
     details: 'Impressão 3D em resina branca de São Miguel Arcanjo em tamanho maior. Mais presença e impacto visual para altares e nichos.',
-    price: '61.96',
+    price: '77.45',
     sizes: ['Médio (309mm)'],
   },
   {
@@ -117,7 +117,7 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'São Carlo Acutis, o beato programador, em representação moderna.',
     details: 'Impressão 3D em resina branca de São Carlo Acutis, padroeiro dos programadores. Peça única que une fé e tecnologia.',
-    price: '28.22',
+    price: '35.28',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -127,7 +127,7 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'São Josemaria Escrivá em representação contemplativa.',
     details: 'Impressão 3D em resina branca de São Josemaria Escrivá, fundador do Opus Dei. Peça para devoção e inspiração espiritual.',
-    price: '23.30',
+    price: '29.13',
     sizes: ['Pequeno (144mm)'],
   },
   {
@@ -137,18 +137,18 @@ const PRODUCTS: Product[] = [
     image: '/images/placeholder.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande.',
     details: 'Impressão 3D em resina branca de Nossa Senhora de Lourdes em tamanho maior. Ideal para capelas e espaços maiores.',
-    price: '58.50',
+    price: '73.13',
     sizes: ['Grande (288mm)'],
   },
   {
     id: 13,
-    name: 'Nossa Senhora de Lourdes Extra Grande',
-    category: 'Nossa Senhora',
+    name: 'Santa Gianna',
+    category: 'Santas',
     image: '/images/placeholder.png',
-    description: 'Nossa Senhora de Lourdes em tamanho extra grande.',
-    details: 'Impressão 3D em resina branca de Nossa Senhora de Lourdes em tamanho extra grande. Peça de destaque para altares principais.',
-    price: '73.13',
-    sizes: ['Extra Grande (288mm)'],
+    description: 'Santa Gianna em representação serena e contemplativa.',
+    details: 'Impressão 3D em resina branca de Santa Gianna, mãe e santa moderna. Peça inspiradora para famílias cristãs.',
+    price: '43.18',
+    sizes: ['Pequeno (144mm)'],
   },
 ];
 
