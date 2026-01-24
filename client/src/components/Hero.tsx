@@ -43,7 +43,7 @@ export default function Hero() {
                 Ver Catálogo
               </a>
               <a
-                href="https://wa.me/5511999999999?text=Olá! Gostaria de conhecer mais sobre os santos impressos em 3D."
+                href="https://wa.me/5547996641959?text=Olá! Gostaria de conhecer mais sobre os santos impressos em 3D."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-3 border-2 border-accent text-accent rounded-lg font-semibold hover:bg-accent/10 transition-all duration-300"

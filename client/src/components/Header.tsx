@@ -36,7 +36,7 @@ export default function Header() {
 
         {/* WhatsApp CTA */}
         <a
-          href="https://wa.me/5511999999999?text=Olá! Gostaria de conhecer mais sobre os santos impressos em 3D."
+          href="https://wa.me/5547996641959?text=Olá! Gostaria de conhecer mais sobre os santos impressos em 3D."
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors duration-300 font-medium text-sm"

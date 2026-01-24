@@ -80,7 +80,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
           {/* WhatsApp CTA */}
           <div className="border-t border-border/50 pt-6">
             <a
-              href={`https://wa.me/5511999999999?text=Olá! Gostaria de encomendar: ${product.name}`}
+              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-4 bg-accent text-background rounded-lg font-bold text-lg hover:bg-accent/90 transition-all duration-300 text-center hover:shadow-lg"

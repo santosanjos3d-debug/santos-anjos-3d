@@ -51,8 +51,11 @@ export const orders = mysqlTable("orders", {
   customerName: varchar("customerName", { length: 255 }).notNull(),
   customerEmail: varchar("customerEmail", { length: 320 }),
   customerPhone: varchar("customerPhone", { length: 20 }),
+  customerCep: varchar("customerCep", { length: 9 }),
   productId: int("productId").notNull(),
   quantity: int("quantity").notNull().default(1),
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  shippingCost: decimal("shippingCost", { precision: 10, scale: 2 }).default("0"),
   totalPrice: decimal("totalPrice", { precision: 10, scale: 2 }).notNull(),
   pixKey: varchar("pixKey", { length: 255 }).notNull(),
   status: mysqlEnum("status", ["pending", "paid", "processing", "completed", "cancelled"]).default("pending").notNull(),
@@ -64,3 +67,20 @@ export const orders = mysqlTable("orders", {
 
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * Tabela de fretes por região
+ */
+export const shippingRates = mysqlTable("shippingRates", {
+  id: int("id").autoincrement().primaryKey(),
+  region: varchar("region", { length: 50 }).notNull().unique(),
+  cepStart: varchar("cepStart", { length: 5 }).notNull(),
+  cepEnd: varchar("cepEnd", { length: 5 }).notNull(),
+  rate100g: decimal("rate100g", { precision: 10, scale: 2 }).notNull(),
+  rate200g: decimal("rate200g", { precision: 10, scale: 2 }).notNull(),
+  prazo: varchar("prazo", { length: 50 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ShippingRate = typeof shippingRates.$inferSelect;
+export type InsertShippingRate = typeof shippingRates.$inferInsert;

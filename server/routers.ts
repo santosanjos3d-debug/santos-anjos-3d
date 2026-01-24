@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getAllProducts, getProductById, createOrder, getOrderByNumber, getAllOrders, updateOrderStatus } from "./db";
+import { getAllProducts, getProductById, createOrder, getOrderByNumber, getAllOrders, updateOrderStatus, calculateShippingCost, initializeShippingRates } from "./db";
 import { nanoid } from "nanoid";
 
 export const appRouter = router({
@@ -26,14 +26,27 @@ export const appRouter = router({
       .query(({ input }) => getProductById(input.id)),
   }),
 
+  shipping: router({
+    calculateCost: publicProcedure
+      .input(z.object({ cep: z.string(), weight: z.number() }))
+      .query(async ({ input }) => calculateShippingCost(input.cep, input.weight)),
+    initialize: publicProcedure.mutation(async () => {
+      await initializeShippingRates();
+      return { success: true };
+    }),
+  }),
+
   orders: router({
     create: publicProcedure
       .input(z.object({
         customerName: z.string().min(1),
         customerEmail: z.string().email().optional(),
         customerPhone: z.string().optional(),
+        customerCep: z.string().optional(),
         productId: z.number(),
         quantity: z.number().min(1).default(1),
+        subtotal: z.string(),
+        shippingCost: z.string().optional(),
         totalPrice: z.string(),
         pixKey: z.string(),
       }))
@@ -44,8 +57,11 @@ export const appRouter = router({
           customerName: input.customerName,
           customerEmail: input.customerEmail || null,
           customerPhone: input.customerPhone || null,
+          customerCep: input.customerCep || null,
           productId: input.productId,
           quantity: input.quantity,
+          subtotal: input.subtotal as any,
+          shippingCost: (input.shippingCost || "0") as any,
           totalPrice: input.totalPrice as any,
           pixKey: input.pixKey,
           status: "pending",
