@@ -130,8 +130,8 @@ export default function Checkout({ productId, productName, productPrice, onClose
                 <p className="text-sm text-gray-600">Produto</p>
                 <p className="font-semibold">{productName}</p>
                 <p className="text-sm text-gray-600 mt-2">Quantidade: {quantity}</p>
-                <p className="text-sm text-gray-600">Preço unitário: R$ {productPrice}</p>
-                <p className="font-semibold text-lg mt-2">Subtotal: R$ {subtotal}</p>
+                <p className="text-sm text-gray-600">Preço unitário: R$ {productPrice.replace('.', ',')}</p>
+                <p className="font-semibold text-lg mt-2">Subtotal: R$ {subtotal.replace('.', ',')}</p>
               </div>
 
               {/* Dados do Cliente */}
@@ -178,7 +178,7 @@ export default function Checkout({ productId, productName, productPrice, onClose
                   <div className="text-xs text-gray-600 mt-2">
                     <p>Região: {shippingRegion}</p>
                     <p>Prazo: {shippingPrazo}</p>
-                    <p className="font-semibold">Frete: R$ {parseFloat(shippingCost).toFixed(2)}</p>
+                    <p className="font-semibold">Frete: R$ {parseFloat(shippingCost).toFixed(2).replace('.', ',')}</p>
                   </div>
                 )}
               </div>
@@ -187,15 +187,15 @@ export default function Checkout({ productId, productName, productPrice, onClose
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div className="flex justify-between mb-2">
                   <span>Subtotal:</span>
-                  <span>R$ {subtotal}</span>
+                  <span>R$ {subtotal.replace('.', ',')}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span>Frete:</span>
-                  <span>R$ {parseFloat(shippingCost).toFixed(2)}</span>
+                  <span>R$ {parseFloat(shippingCost).toFixed(2).replace('.', ',')}</span>
                 </div>
                 <div className="border-t border-blue-200 pt-2 flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span>R$ {totalPrice}</span>
+                  <span>R$ {totalPrice.replace('.', ',')}</span>
                 </div>
               </div>
 
@@ -214,7 +214,7 @@ export default function Checkout({ productId, productName, productPrice, onClose
             <div className="space-y-4">
               <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                 <p className="text-sm text-green-700 font-semibold">Pedido: {orderNumber}</p>
-                <p className="text-2xl font-bold text-green-700 mt-2">R$ {totalPrice}</p>
+                <p className="text-2xl font-bold text-green-700 mt-2">R$ {totalPrice.replace('.', ',')}</p>
               </div>
 
               <div className="flex justify-center">
@@ -240,7 +240,7 @@ export default function Checkout({ productId, productName, productPrice, onClose
               <div className="bg-blue-50 p-3 rounded text-sm text-blue-800">
                 <p>1. Abra seu app bancário</p>
                 <p>2. Escaneie o QR Code ou copie a chave PIX</p>
-                <p>3. Confirme o pagamento de R$ {totalPrice}</p>
+                <p>3. Confirme o pagamento de R$ {totalPrice.replace('.', ',')}</p>
               </div>
 
               <Button
@@ -263,7 +263,7 @@ export default function Checkout({ productId, productName, productPrice, onClose
               <div>
                 <p className="text-lg font-semibold">Obrigado pela compra!</p>
                 <p className="text-sm text-gray-600 mt-2">Número do pedido: {orderNumber}</p>
-                <p className="text-sm text-gray-600">Valor: R$ {totalPrice}</p>
+                <p className="text-sm text-gray-600">Valor: R$ {totalPrice.replace('.', ',')}</p>
               </div>
 
               <div className="bg-blue-50 p-3 rounded text-sm">

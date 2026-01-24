@@ -52,7 +52,7 @@ export default function ProductCard({
 
         {/* Price */}
         <div className="pt-2 border-t border-border/50">
-          <p className="text-lg font-bold text-accent">R$ {price}</p>
+          <p className="text-lg font-bold text-accent">R$ {price.replace('.', ',')}</p>
         </div>
 
         {/* CTA Buttons */}
