@@ -64,7 +64,7 @@ const PRODUCTS: Product[] = [
     id: 5,
     name: 'São José com Menino Jesus',
     category: 'Santos',
-    image: '/images/sao-jose-menino-jesus-edited.png',
+    image: '/images/sao-jose-menino-jesus-real-edited.png',
     description: 'São José segurando o Menino Jesus com ternura e proteção.',
     details: 'Representação tocante da relação entre São José e Jesus. Impressão em resina branca com detalhes delicados que refletem o amor e a proteção de São José.',
     price: '180.00',
