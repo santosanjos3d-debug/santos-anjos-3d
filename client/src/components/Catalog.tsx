@@ -1,4 +1,4 @@
-/**
+/*
  * Catalog Component
  * Design: Minimalismo Sagrado - Grid responsivo de produtos com espaçamento generoso
  */
@@ -27,8 +27,8 @@ const PRODUCTS: Product[] = [
     image: '/images/sagrado-coracao-maria-edited.png',
     description: 'Estatueta de Nossa Senhora de Lourdes em resina branca com detalhes delicados.',
     details: 'Impressão 3D de alta qualidade em resina branca. Cada detalhe foi cuidadosamente capturado para refletir a beleza e serenidade de Nossa Senhora de Lourdes, padroeira dos doentes.',
-    price: '150.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '23.46',
+    sizes: ['Pequeno (144mm)'],
   },
   {
     id: 2,
@@ -37,8 +37,8 @@ const PRODUCTS: Product[] = [
     image: '/images/nossa-senhora-lourdes-edited.png',
     description: 'Representação do Sagrado Coração de Maria em resina branca.',
     details: 'Impressão 3D em resina branca de alta qualidade. Captura a devoção e amor do Sagrado Coração de Maria com detalhes precisos e acabamento fino.',
-    price: '165.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '32.68',
+    sizes: ['Pequeno (144mm)'],
   },
   {
     id: 3,
@@ -47,8 +47,8 @@ const PRODUCTS: Product[] = [
     image: '/images/santa-hildegarda-bingen-edited.png',
     description: 'Santa Hildegarda de Bingen com palma e livro, símbolo de sabedoria.',
     details: 'Impressão 3D em resina branca. Santa Hildegarda é representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Peça de grande significado espiritual.',
-    price: '155.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '32.46',
+    sizes: ['Pequeno (144mm)'],
   },
   {
     id: 4,
@@ -57,8 +57,8 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-francisco-assis-edited.png',
     description: 'Santo Francisco de Assis em pose contemplativa com livro.',
     details: 'Representação tocante de São Francisco em sua postura de contemplação. Impressão em resina branca com detalhes que capturam a serenidade e espiritualidade do santo.',
-    price: '160.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '28.08',
+    sizes: ['Pequeno (144mm)'],
   },
   {
     id: 5,
@@ -67,8 +67,8 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-jose-menino-jesus-real-edited.png',
     description: 'São José segurando o Menino Jesus com ternura e proteção.',
     details: 'Representação tocante da relação entre São José e Jesus. Impressão em resina branca com detalhes delicados que refletem o amor e a proteção de São José.',
-    price: '180.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '31.50',
+    sizes: ['Pequeno (144mm)'],
   },
   {
     id: 6,
@@ -77,58 +77,109 @@ const PRODUCTS: Product[] = [
     image: '/images/sao-jose-coluna-edited.png',
     description: 'Santo Antônio em coluna alta, representação majestosa e contemplativa.',
     details: 'Impressão 3D em resina branca de Santo Antônio. Representação clássica do santo em sua forma contemplativa. Ideal para nichos e altares que exigem maior altura e presença.',
-    price: '195.00',
-    sizes: ['Pequeno (8x16cm, 100g)', 'Médio (10x30cm, 200g)'],
+    price: '25.94',
+    sizes: ['Pequeno (144mm)'],
+  },
+  {
+    id: 7,
+    name: 'São Bento',
+    category: 'Santos',
+    image: '/images/placeholder.png',
+    description: 'São Bento em representação clássica com cruz e livro.',
+    details: 'Impressão 3D em resina branca de São Bento, padroeiro dos beneditinos. Peça com grande valor espiritual e histórico.',
+    price: '31.32',
+    sizes: ['Pequeno (144mm)'],
+  },
+  {
+    id: 8,
+    name: 'São Miguel Pequeno',
+    category: 'Santos',
+    image: '/images/placeholder.png',
+    description: 'São Miguel Arcanjo em tamanho pequeno com espada e escudo.',
+    details: 'Impressão 3D em resina branca de São Miguel Arcanjo. Representação do protetor contra o mal, ideal para proteção espiritual.',
+    price: '35.42',
+    sizes: ['Pequeno (170mm)'],
+  },
+  {
+    id: 9,
+    name: 'São Miguel Médio',
+    category: 'Santos',
+    image: '/images/placeholder.png',
+    description: 'São Miguel Arcanjo em tamanho médio com espada e escudo.',
+    details: 'Impressão 3D em resina branca de São Miguel Arcanjo em tamanho maior. Mais presença e impacto visual para altares e nichos.',
+    price: '61.96',
+    sizes: ['Médio (309mm)'],
+  },
+  {
+    id: 10,
+    name: 'São Carlo Acutis',
+    category: 'Santos',
+    image: '/images/placeholder.png',
+    description: 'São Carlo Acutis, o beato programador, em representação moderna.',
+    details: 'Impressão 3D em resina branca de São Carlo Acutis, padroeiro dos programadores. Peça única que une fé e tecnologia.',
+    price: '28.22',
+    sizes: ['Pequeno (144mm)'],
+  },
+  {
+    id: 11,
+    name: 'São Josemaria',
+    category: 'Santos',
+    image: '/images/placeholder.png',
+    description: 'São Josemaria Escrivá em representação contemplativa.',
+    details: 'Impressão 3D em resina branca de São Josemaria Escrivá, fundador do Opus Dei. Peça para devoção e inspiração espiritual.',
+    price: '23.30',
+    sizes: ['Pequeno (144mm)'],
+  },
+  {
+    id: 12,
+    name: 'Nossa Senhora de Lourdes Grande',
+    category: 'Nossa Senhora',
+    image: '/images/placeholder.png',
+    description: 'Nossa Senhora de Lourdes em tamanho grande.',
+    details: 'Impressão 3D em resina branca de Nossa Senhora de Lourdes em tamanho maior. Ideal para capelas e espaços maiores.',
+    price: '58.50',
+    sizes: ['Grande (288mm)'],
+  },
+  {
+    id: 13,
+    name: 'Nossa Senhora de Lourdes Extra Grande',
+    category: 'Nossa Senhora',
+    image: '/images/placeholder.png',
+    description: 'Nossa Senhora de Lourdes em tamanho extra grande.',
+    details: 'Impressão 3D em resina branca de Nossa Senhora de Lourdes em tamanho extra grande. Peça de destaque para altares principais.',
+    price: '73.13',
+    sizes: ['Extra Grande (288mm)'],
   },
 ];
 
 export default function Catalog() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [checkoutProduct, setCheckoutProduct] = useState<Product | undefined>();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [cartItem, setCartItem] = useState<{ product: Product; quantity: number } | null>(null);
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
+  const handleBuyNow = (product: Product) => {
+    setCartItem({ product, quantity: 1 });
+    setIsCheckoutOpen(true);
   };
 
-  const handleBuyClick = (product: Product) => {
-    setCheckoutProduct(product);
-    setIsCheckoutOpen(true);
-    setIsModalOpen(false);
+  const handleViewDetails = (product: Product) => {
+    setSelectedProduct(product);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setTimeout(() => setSelectedProduct(undefined), 300);
-  };
-
-  const handleCloseCheckout = () => {
-    setIsCheckoutOpen(false);
-    setTimeout(() => setCheckoutProduct(undefined), 300);
+    setSelectedProduct(null);
   };
 
   return (
-    <section id="catalogo" className="py-20 bg-background">
-      <div className="container">
-        {/* Section Header */}
-        <div className="text-center mb-16 space-y-4">
-          <p className="text-accent text-sm font-semibold tracking-widest uppercase">
-            Nossos Produtos
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-            Catálogo de Santos
-          </h2>
-          <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+    <section className="py-20 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Catálogo de Santos</h2>
+          <p className="text-lg text-muted-foreground">
             Cada peça é uma obra de arte, cuidadosamente impressa em 3D com atenção aos detalhes e qualidade superior.
           </p>
         </div>
 
-        {/* Divisor */}
-        <div className="h-px bg-gradient-to-r from-transparent via-accent to-transparent mb-16"></div>
-
-        {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {PRODUCTS.map((product) => (
             <ProductCard
@@ -139,28 +190,23 @@ export default function Catalog() {
               image={product.image}
               description={product.description}
               price={product.price}
-              onDetailsClick={() => handleProductClick(product)}
-              onBuyClick={() => handleBuyClick(product)}
+              onBuyClick={() => handleBuyNow(product)}
+              onDetailsClick={() => handleViewDetails(product)}
             />
           ))}
         </div>
       </div>
 
-      {/* Product Modal */}
-      <ProductModal
-        isOpen={isModalOpen}
-        product={selectedProduct}
-        onClose={handleCloseModal}
-        onBuyClick={selectedProduct ? () => handleBuyClick(selectedProduct) : undefined}
-      />
+      {selectedProduct && (
+        <ProductModal isOpen={true} product={selectedProduct} onClose={handleCloseModal} />
+      )}
 
-      {/* Checkout Modal */}
-      {isCheckoutOpen && checkoutProduct && (
+      {isCheckoutOpen && cartItem && (
         <Checkout
-          productId={checkoutProduct.id}
-          productName={checkoutProduct.name}
-          productPrice={checkoutProduct.price}
-          onClose={handleCloseCheckout}
+          productId={cartItem.product.id}
+          productName={cartItem.product.name}
+          productPrice={cartItem.product.price}
+          onClose={() => setIsCheckoutOpen(false)}
         />
       )}
     </section>
