@@ -104,7 +104,7 @@ const PRODUCTS: Product[] = [
     id: 9,
     name: 'São Miguel Médio',
     category: 'Santos',
-    image: '/images/placeholder.png',
+    image: '/images/sao-miguel-medio-edited.png',
     description: 'São Miguel Arcanjo em tamanho médio com espada e escudo.',
     details: 'Impressão 3D em PETG com filamento fundido de São Miguel Arcanjo em tamanho maior. Mais presença e impacto visual para altares e nichos.',
     price: '77.45',
