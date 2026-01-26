@@ -124,7 +124,7 @@ const PRODUCTS: Product[] = [
     id: 11,
     name: 'São Josemaria',
     category: 'Santos',
-    image: '/images/placeholder.png',
+    image: '/images/sao-josemaria-edited.png',
     description: 'São Josemaria Escrivá em representação contemplativa.',
     details: 'Impressão 3D em PETG com filamento fundido de São Josemaria Escrivá, fundador do Opus Dei. Peça para devoção e inspiração espiritual.',
     price: '29.13',
