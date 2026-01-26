@@ -84,7 +84,7 @@ const PRODUCTS: Product[] = [
     id: 7,
     name: 'São Bento',
     category: 'Santos',
-    image: '/images/placeholder.png',
+    image: '/images/sao-bento-edited.png',
     description: 'São Bento em representação clássica com cruz e livro.',
     details: 'Impressão 3D em PETG com filamento fundido de São Bento, padroeiro dos beneditinos. Peça com grande valor espiritual e histórico.',
     price: '39.15',
