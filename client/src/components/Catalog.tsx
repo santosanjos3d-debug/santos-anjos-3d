@@ -94,11 +94,11 @@ const PRODUCTS: Product[] = [
     id: 8,
     name: 'São Miguel Pequeno',
     category: 'Santos',
-    image: '/images/placeholder.png',
+    image: '/images/sao-miguel-medio-edited.png',
     description: 'São Miguel Arcanjo em tamanho pequeno com espada e escudo.',
     details: 'Impressão 3D em PETG com filamento fundido de São Miguel Arcanjo. Representação do protetor contra o mal, ideal para proteção espiritual.',
     price: '44.28',
-    sizes: ['Pequeno (170mm)'],
+    sizes: ['Pequeno (94mm)'],
   },
   {
     id: 9,
@@ -112,16 +112,6 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 10,
-    name: 'São Carlo Acutis',
-    category: 'Santos',
-    image: '/images/placeholder.png',
-    description: 'São Carlo Acutis, o beato programador, em representação moderna.',
-    details: 'Impressão 3D em PETG com filamento fundido de São Carlo Acutis, padroeiro dos programadores. Peça única que une fé e tecnologia.',
-    price: '35.28',
-    sizes: ['Pequeno (144mm)'],
-  },
-  {
-    id: 11,
     name: 'São Josemaria',
     category: 'Santos',
     image: '/images/sao-josemaria-edited.png',
@@ -131,7 +121,7 @@ const PRODUCTS: Product[] = [
     sizes: ['Pequeno (144mm)'],
   },
   {
-    id: 12,
+    id: 11,
     name: 'Nossa Senhora de Lourdes Grande - Branca',
     category: 'Nossa Senhora',
     image: '/images/nossa-senhora-lourdes-grande-branca-edited.png',
@@ -141,7 +131,7 @@ const PRODUCTS: Product[] = [
     sizes: ['Grande (288mm)'],
   },
   {
-    id: 14,
+    id: 12,
     name: 'Nossa Senhora de Lourdes Grande - Marrom',
     category: 'Nossa Senhora',
     image: '/images/nossa-senhora-lourdes-grande-marrom-edited.png',
@@ -151,7 +141,7 @@ const PRODUCTS: Product[] = [
     sizes: ['Grande (288mm)'],
   },
   {
-    id: 15,
+    id: 13,
     name: 'Nossa Senhora de Lourdes Grande - Verde',
     category: 'Nossa Senhora',
     image: '/images/nossa-senhora-lourdes-grande-verde-edited.png',
@@ -161,7 +151,7 @@ const PRODUCTS: Product[] = [
     sizes: ['Grande (288mm)'],
   },
   {
-    id: 13,
+    id: 14,
     name: 'Santa Gianna',
     category: 'Santas',
     image: '/images/placeholder.png',
