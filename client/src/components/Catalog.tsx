@@ -134,7 +134,7 @@ const PRODUCTS: Product[] = [
     id: 12,
     name: 'Nossa Senhora de Lourdes Grande - Branca',
     category: 'Nossa Senhora',
-    image: '/images/nossa-senhora-lourdes-grande-branca-edited.png',
+    image: '/images/nossa-senhora-lourdes-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor branca.',
     details: 'Impressão 3D em PETG com filamento fundido branca de Nossa Senhora de Lourdes em tamanho maior. Ideal para capelas e espaços maiores. Versão clássica em branco puro.',
     price: '73,13',
