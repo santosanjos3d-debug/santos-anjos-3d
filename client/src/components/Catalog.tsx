@@ -144,7 +144,7 @@ const PRODUCTS: Product[] = [
     id: 13,
     name: 'Nossa Senhora de Lourdes Grande - Verde',
     category: 'Nossa Senhora',
-    image: '/images/nossa-senhora-lourdes-grande-verde-edited.png',
+    image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor verde.',
     details: 'Impressão 3D em PETG com filamento fundido verde de Nossa Senhora de Lourdes em tamanho maior. Versão em tom verde natural, trazendo frescor e conexão com a natureza.',
     price: '73.13',
