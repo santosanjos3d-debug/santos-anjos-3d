@@ -134,7 +134,7 @@ const PRODUCTS: Product[] = [
     id: 12,
     name: 'Nossa Senhora de Lourdes Grande - Marrom',
     category: 'Nossa Senhora',
-    image: '/images/nossa-senhora-lourdes-grande-marrom-edited.png',
+    image: '/images/nossa-senhora-lourdes-grande-marrom-real-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor marrom.',
     details: 'Impressão 3D em PETG com filamento fundido marrom de Nossa Senhora de Lourdes em tamanho maior. Versão em tom madeira quente, ideal para ambientes com decoração rústica.',
     price: '73.13',
