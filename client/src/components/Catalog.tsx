@@ -84,7 +84,7 @@ const PRODUCTS: Product[] = [
     id: 7,
     name: 'Santo Antônio',
     category: 'Santos',
-    image: '/images/santo-antonio-edited.png',
+    image: '/images/santo-antonio-nobg.png',
     description: 'Santo Antônio com o Menino Jesus, santo do amor e da família.',
     details: 'Impressão 3D em PETG com filamento fundido. Santo Antônio é representado com o Menino Jesus em seus braços, simbolizando proteção, amor e fé. Peça tradicional muito venerada.',
     price: '32,43',
