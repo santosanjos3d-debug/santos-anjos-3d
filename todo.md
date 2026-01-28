@@ -23,4 +23,5 @@
 - [x] Processar imagem de Santa Hildegarda Verde com fundo branco
 - [x] Adicionar Santa Hildegarda Verde ao catálogo
 - [x] Testar catálogo atualizado
-- [x] Salvar checkpoint com novo produto
+- [x] Editar imagem com fundo branco padronizado
+- [x] Verificar imagem no catálogo
