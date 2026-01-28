@@ -160,6 +160,16 @@ const PRODUCTS: Product[] = [
     price: '73,13',
     sizes: ['Grande (288mm)'],
   },
+  {
+    id: 15,
+    name: 'Santa Hildegarda Verde',
+    category: 'Santas',
+    image: '/images/santa-hildegarda-verde-edited.png',
+    description: 'Santa Hildegarda em filamento PETG verde, com palma e livro.',
+    details: 'Impressão 3D em PETG com filamento fundido verde de Santa Hildegarda de Bingen. Representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Versão em tom verde vibrante, trazendo frescor espiritual.',
+    price: '40,58',
+    sizes: ['Pequeno (144mm)'],
+  },
 ];
 
 export default function Catalog() {
