@@ -1,6 +1,6 @@
 /**
  * ProductModal Component
- * Design: Minimalismo Sagrado - Modal com imagem grande, seletor de cores e CTA WhatsApp destacado
+ * Design: Minimalismo Sagrado - Modal com imagem grande, seletor de cores, tamanhos com preço dinâmico e CTA WhatsApp destacado
  */
 
 import { useState } from 'react';
@@ -10,6 +10,12 @@ interface ProductColor {
   name: string;
   value: string;
   image: string;
+}
+
+interface ProductSize {
+  size: string;
+  label: string;
+  price: string;
 }
 
 interface ProductModalProps {
@@ -22,7 +28,7 @@ interface ProductModalProps {
     description: string;
     details: string;
     price: string;
-    sizes?: string[];
+    sizes?: ProductSize[];
     colors?: ProductColor[];
   };
   onClose: () => void;
@@ -31,16 +37,24 @@ interface ProductModalProps {
 
 export default function ProductModal({ isOpen, product, onClose }: ProductModalProps) {
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0]?.value || 'white');
+  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0]?.size || 'P');
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
 
   if (!isOpen || !product) return null;
 
   const currentColor = product.colors?.find(c => c.value === selectedColor);
+  const currentSize = product.sizes?.find(s => s.size === selectedSize);
   const displayImage = currentColor?.image || product.image;
+  const displayPrice = currentSize?.price || product.price;
+  const displayLabel = currentSize?.label || 'Tamanho';
 
   const handleColorChange = (colorValue: string, colorImage: string) => {
     setSelectedColor(colorValue);
     setSelectedImage(colorImage);
+  };
+
+  const handleSizeChange = (sizeValue: string) => {
+    setSelectedSize(sizeValue);
   };
 
   return (
@@ -79,6 +93,29 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             <p className="text-foreground/70 text-sm leading-relaxed">{product.details}</p>
           </div>
 
+          {/* Size Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground">Escolha o Tamanho</h3>
+              <div className="flex flex-wrap gap-3">
+                {product.sizes.map((sizeOption) => (
+                  <button
+                    key={sizeOption.size}
+                    onClick={() => handleSizeChange(sizeOption.size)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      selectedSize === sizeOption.size
+                        ? 'bg-accent text-background border-2 border-accent'
+                        : 'border-2 border-border text-foreground hover:border-accent'
+                    }`}
+                  >
+                    <div className="text-sm">{sizeOption.size}</div>
+                    <div className="text-xs opacity-75">{sizeOption.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Color Selector */}
           {product.colors && product.colors.length > 0 && (
             <div className="space-y-3">
@@ -101,27 +138,23 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             </div>
           )}
 
-          {/* Sizes if available */}
-          {product.sizes && product.sizes.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">Tamanhos Disponíveis</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <span
-                    key={size}
-                    className="px-4 py-2 border border-border rounded-lg text-sm text-foreground hover:border-accent transition-colors duration-300 cursor-pointer"
-                  >
-                    {size}
-                  </span>
-                ))}
+          {/* Price Display */}
+          <div className="border-t border-border/50 pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{displayLabel}</p>
+                <p className="text-3xl font-bold text-accent">R$ {displayPrice}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Cor: {currentColor?.name || 'Padrão'}</p>
               </div>
             </div>
-          )}
+          </div>
 
           {/* WhatsApp CTA */}
           <div className="border-t border-border/50 pt-6">
             <a
-              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name} - Cor: ${currentColor?.name || 'Padrão'}`}
+              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name} - Tamanho: ${displayLabel} - Cor: ${currentColor?.name || 'Padrão'} - Preço: R$ ${displayPrice}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-4 bg-accent text-background rounded-lg font-bold text-lg hover:bg-accent/90 transition-all duration-300 text-center hover:shadow-lg"

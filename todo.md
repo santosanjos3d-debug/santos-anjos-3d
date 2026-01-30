@@ -31,3 +31,9 @@
 - [x] Implementar componente de seletor de cores na UI
 - [x] Testar seletor de cores e integração com carrinho
 - [x] Salvar checkpoint com seletor de cores implementado
+
+## Novo Recurso: Seletor de Tamanhos com Preços
+- [x] Atualizar estrutura de dados dos produtos com variações de tamanhos e preços
+- [x] Implementar componente de seletor de tamanhos na UI com preço dinâmico
+- [x] Testar seletor de tamanhos e integração com WhatsApp
+- [x] Salvar checkpoint com seletor de tamanhos implementado
