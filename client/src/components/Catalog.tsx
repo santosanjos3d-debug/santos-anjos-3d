@@ -8,6 +8,12 @@ import ProductCard from './ProductCard';
 import ProductModal from './ProductModal';
 import Checkout from './Checkout';
 
+interface ProductColor {
+  name: string;
+  value: string;
+  image: string;
+}
+
 interface Product {
   id: number;
   name: string;
@@ -17,6 +23,7 @@ interface Product {
   details: string;
   price: string;
   sizes?: string[];
+  colors?: ProductColor[];
 }
 
 const PRODUCTS: Product[] = [
@@ -29,6 +36,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D de alta qualidade em PETG com filamento fundido. Cada detalhe foi cuidadosamente capturado para refletir a beleza e serenidade de Nossa Senhora de Lourdes, padroeira dos doentes.',
     price: '29,33',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sagrado-coracao-maria-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sagrado-coracao-maria-edited.png' },
+    ],
   },
   {
     id: 2,
@@ -39,6 +51,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido de alta qualidade. Captura a devoção e amor do Sagrado Coração de Maria com detalhes precisos e acabamento fino.',
     price: '40,85',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/nossa-senhora-lourdes-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/nossa-senhora-lourdes-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-edited.png' },
+    ],
   },
   {
     id: 3,
@@ -49,6 +66,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido de Santa Gianna, mãe e santa moderna. Peça inspiradora para famílias cristãs.',
     price: '43,18',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/santa-gianna-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/santa-gianna-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/santa-gianna-edited.png' },
+    ],
   },
   {
     id: 4,
@@ -59,6 +81,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. Santa Hildegarda é representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Peça de grande significado espiritual.',
     price: '40,58',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/santa-hildegarda-bingen-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/santa-hildegarda-bingen-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/santa-hildegarda-verde-edited.png' },
+    ],
   },
   {
     id: 5,
@@ -69,6 +96,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. São Francisco é representado em sua característica pose contemplativa, cercado pelos símbolos da natureza que ele tão profundamente amava e respeitava.',
     price: '35,10',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-francisco-assis-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-francisco-assis-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-francisco-assis-edited.png' },
+    ],
   },
   {
     id: 6,
@@ -79,6 +111,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. Esta representação captura o amor paternal de São José e sua devoção ao Menino Jesus. Peça perfeita para lares cristãos.',
     price: '39,38',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-jose-menino-jesus-real-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-jose-menino-jesus-real-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-jose-menino-jesus-real-edited.png' },
+    ],
   },
   {
     id: 7,
@@ -89,6 +126,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. Santo Antônio é representado com o Menino Jesus em seus braços, simbolizando proteção, amor e fé. Peça tradicional muito venerada.',
     price: '32,43',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/santo-antonio-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/santo-antonio-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/santo-antonio-edited.png' },
+    ],
   },
   {
     id: 8,
@@ -99,6 +141,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. São Bento é representado em suas vestes monásticas, com a cruz e o livro de sua regra. Símbolo de sabedoria espiritual e vida contemplativa.',
     price: '39,15',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-bento-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-bento-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-bento-edited.png' },
+    ],
   },
   {
     id: 9,
@@ -109,6 +156,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido de São Josemaria. Fundador do Opus Dei, representa a santidade na vida ordinária. Peça inspiradora para leigos cristãos.',
     price: '29,13',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-josemaria-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-josemaria-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-josemaria-edited.png' },
+    ],
   },
   {
     id: 10,
@@ -119,6 +171,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. São Miguel é representado como protetor e guerreiro espiritual, com asas majestosas e lança. Símbolo de vitória sobre o mal.',
     price: '44,28',
     sizes: ['Pequeno (94mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-miguel-medio-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-miguel-medio-edited.png' },
+    ],
   },
   {
     id: 11,
@@ -129,6 +186,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. São Miguel é representado como protetor e guerreiro espiritual, com asas majestosas e lança. Símbolo de vitória sobre o mal.',
     price: '77,45',
     sizes: ['Médio (308mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/sao-miguel-medio-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/sao-miguel-medio-edited.png' },
+    ],
   },
   {
     id: 12,
@@ -139,6 +201,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido branca de Nossa Senhora de Lourdes em tamanho maior. Ideal para capelas e espaços maiores. Versão clássica em branco puro.',
     price: '73,13',
     sizes: ['Grande (288mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/nossa-senhora-lourdes-grande-marrom-real-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png' },
+    ],
   },
   {
     id: 13,
@@ -149,6 +216,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido marrom de Nossa Senhora de Lourdes em tamanho maior. Versão em tom madeira quente, ideal para ambientes com decoração rústica.',
     price: '73,13',
     sizes: ['Grande (288mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/nossa-senhora-lourdes-grande-marrom-real-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png' },
+    ],
   },
   {
     id: 14,
@@ -159,6 +231,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido verde de Nossa Senhora de Lourdes em tamanho maior. Versão em tom verde natural, trazendo frescor e conexão com a natureza.',
     price: '73,13',
     sizes: ['Grande (288mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/nossa-senhora-lourdes-grande-marrom-real-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png' },
+    ],
   },
   {
     id: 15,
@@ -169,6 +246,11 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido verde de Santa Hildegarda de Bingen. Representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Versão em tom verde vibrante, trazendo frescor espiritual.',
     price: '40,58',
     sizes: ['Pequeno (144mm)'],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/santa-hildegarda-bingen-edited.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/santa-hildegarda-bingen-edited.png' },
+      { name: 'Verde', value: 'green', image: '/images/santa-hildegarda-verde-edited.png' },
+    ],
   },
 ];
 

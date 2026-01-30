@@ -1,9 +1,16 @@
 /**
  * ProductModal Component
- * Design: Minimalismo Sagrado - Modal com imagem grande e CTA WhatsApp destacado
+ * Design: Minimalismo Sagrado - Modal com imagem grande, seletor de cores e CTA WhatsApp destacado
  */
 
+import { useState } from 'react';
 import { X } from 'lucide-react';
+
+interface ProductColor {
+  name: string;
+  value: string;
+  image: string;
+}
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -16,13 +23,25 @@ interface ProductModalProps {
     details: string;
     price: string;
     sizes?: string[];
+    colors?: ProductColor[];
   };
   onClose: () => void;
   onBuyClick?: () => void;
 }
 
 export default function ProductModal({ isOpen, product, onClose }: ProductModalProps) {
+  const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0]?.value || 'white');
+  const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
+
   if (!isOpen || !product) return null;
+
+  const currentColor = product.colors?.find(c => c.value === selectedColor);
+  const displayImage = currentColor?.image || product.image;
+
+  const handleColorChange = (colorValue: string, colorImage: string) => {
+    setSelectedColor(colorValue);
+    setSelectedImage(colorImage);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -43,7 +62,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
           {/* Image */}
           <div className="rounded-lg overflow-hidden bg-secondary">
             <img
-              src={product.image}
+              src={displayImage}
               alt={product.name}
               className="w-full h-auto object-cover"
             />
@@ -59,6 +78,28 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             <p className="text-foreground/80 leading-relaxed">{product.description}</p>
             <p className="text-foreground/70 text-sm leading-relaxed">{product.details}</p>
           </div>
+
+          {/* Color Selector */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground">Escolha a Cor</h3>
+              <div className="flex flex-wrap gap-3">
+                {product.colors.map((color) => (
+                  <button
+                    key={color.value}
+                    onClick={() => handleColorChange(color.value, color.image)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      selectedColor === color.value
+                        ? 'bg-accent text-background border-2 border-accent'
+                        : 'border-2 border-border text-foreground hover:border-accent'
+                    }`}
+                  >
+                    {color.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Sizes if available */}
           {product.sizes && product.sizes.length > 0 && (
@@ -80,7 +121,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
           {/* WhatsApp CTA */}
           <div className="border-t border-border/50 pt-6">
             <a
-              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name}`}
+              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name} - Cor: ${currentColor?.name || 'Padrão'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-4 bg-accent text-background rounded-lg font-bold text-lg hover:bg-accent/90 transition-all duration-300 text-center hover:shadow-lg"

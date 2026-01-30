@@ -25,3 +25,9 @@
 - [x] Testar catálogo atualizado
 - [x] Editar imagem com fundo branco padronizado
 - [x] Verificar imagem no catálogo
+
+## Novo Recurso: Seletor de Cores
+- [x] Atualizar estrutura de dados dos produtos com variações de cores
+- [x] Implementar componente de seletor de cores na UI
+- [x] Testar seletor de cores e integração com carrinho
+- [x] Salvar checkpoint com seletor de cores implementado
