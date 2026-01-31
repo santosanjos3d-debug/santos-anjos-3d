@@ -37,3 +37,9 @@
 - [x] Implementar componente de seletor de tamanhos na UI com preço dinâmico
 - [x] Testar seletor de tamanhos e integração com WhatsApp
 - [x] Salvar checkpoint com seletor de tamanhos implementado
+
+## Bug Fix: Erro "Failed to fetch" na API
+- [x] Investigar e diagnosticar o erro de API
+- [x] Verificar logs do servidor e conectividade
+- [x] Corrigir o problema identificado
+- [x] Testar a API e confirmar o funcionamento
