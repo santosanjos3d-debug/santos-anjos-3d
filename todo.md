@@ -43,3 +43,10 @@
 - [x] Verificar logs do servidor e conectividade
 - [x] Corrigir o problema identificado
 - [x] Testar a API e confirmar o funcionamento
+
+## Novo Recurso: Carrinho de Compras Persistente
+- [x] Criar hook useCart com gerenciamento de estado e localStorage
+- [x] Implementar componente Cart com interface visual
+- [x] Integrar carrinho com ProductModal e adicionar botão 'Adicionar ao Carrinho'
+- [x] Implementar integração com WhatsApp para checkout
+- [x] Testar carrinho e salvar checkpoint

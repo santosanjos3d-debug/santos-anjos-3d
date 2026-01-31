@@ -4,7 +4,8 @@
  */
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/_core/hooks/useCart';
 
 interface ProductColor {
   name: string;
@@ -39,6 +40,8 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0]?.value || 'white');
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0]?.size || 'P');
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
+  const { addItem } = useCart();
+  const [addedToCart, setAddedToCart] = useState(false);
 
   if (!isOpen || !product) return null;
 
@@ -55,6 +58,21 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
 
   const handleSizeChange = (sizeValue: string) => {
     setSelectedSize(sizeValue);
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      productName: product.name,
+      productImage: displayImage,
+      color: currentColor?.name as 'Branco' | 'Marrom' | 'Verde',
+      size: selectedSize as 'P' | 'M' | 'G',
+      sizeLabel: displayLabel,
+      price: displayPrice,
+      quantity: 1,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   return (
@@ -151,8 +169,19 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             </div>
           </div>
 
-          {/* WhatsApp CTA */}
-          <div className="border-t border-border/50 pt-6">
+          {/* Add to Cart and WhatsApp CTA */}
+          <div className="border-t border-border/50 pt-6 space-y-3">
+            <button
+              onClick={handleAddToCart}
+              className={`w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+                addedToCart
+                  ? 'bg-green-500 text-white'
+                  : 'bg-secondary text-foreground hover:bg-secondary/80'
+              }`}
+            >
+              <ShoppingCart size={20} />
+              {addedToCart ? 'Adicionado ao Carrinho!' : 'Adicionar ao Carrinho'}
+            </button>
             <a
               href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name} - Tamanho: ${displayLabel} - Cor: ${currentColor?.name || 'Padrão'} - Preço: R$ ${displayPrice}`}
               target="_blank"
