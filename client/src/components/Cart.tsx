@@ -1,10 +1,10 @@
-import { useCart } from '@/_core/hooks/useCart';
+import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Cart() {
-  const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCart();
+  const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCartWithSync();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleCheckout = () => {
@@ -12,14 +12,13 @@ export default function Cart() {
 
     // Build message with all cart items
     const cartSummary = cart
-      .map(
-        item =>
-          `${item.productName} (${item.color}, ${item.sizeLabel}) - ${item.price} x ${item.quantity}`
+      .map((item: any) =>
+        `${item.productName} (${item.color}, ${item.sizeLabel}) - ${item.price} x ${item.quantity}`
       )
       .join('\n');
 
     const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\nTotal: ${totalPriceFormatted}`;
-    const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/5547996641959?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -69,7 +68,7 @@ export default function Cart() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {cart.map(item => (
+                  {cart.map((item: any) => (
                     <div
                       key={item.id}
                       className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition"

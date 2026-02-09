@@ -36,6 +36,7 @@ export function useCart() {
     if (isLoaded) {
       try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+        console.log('[Cart] Saved to localStorage:', cart);
       } catch (error) {
         console.error('Failed to save cart to localStorage:', error);
       }
@@ -44,18 +45,25 @@ export function useCart() {
 
   const addItem = useCallback((item: Omit<CartItem, 'id'>) => {
     const itemId = `${item.productId}-${item.color}-${item.size}`;
+    console.log('[Cart] Adding item:', { itemId, item });
     
     setCart(prevCart => {
       const existingItem = prevCart.find(i => i.id === itemId);
+      console.log('[Cart] Current cart:', prevCart);
+      console.log('[Cart] Existing item:', existingItem);
       
       if (existingItem) {
         // If item already exists, increase quantity
-        return prevCart.map(i =>
+        const updated = prevCart.map(i =>
           i.id === itemId ? { ...i, quantity: i.quantity + item.quantity } : i
         );
+        console.log('[Cart] Updated cart (existing):', updated);
+        return updated;
       } else {
         // Add new item
-        return [...prevCart, { ...item, id: itemId }];
+        const updated = [...prevCart, { ...item, id: itemId }];
+        console.log('[Cart] Updated cart (new):', updated);
+        return updated;
       }
     });
   }, []);

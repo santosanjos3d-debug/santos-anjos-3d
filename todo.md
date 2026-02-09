@@ -50,3 +50,16 @@
 - [x] Integrar carrinho com ProductModal e adicionar botão 'Adicionar ao Carrinho'
 - [x] Implementar integração com WhatsApp para checkout
 - [x] Testar carrinho e salvar checkpoint
+
+## Bug Fix: Carrinho não está adicionando itens
+- [ ] Investigar e diagnosticar o problema do carrinho
+- [ ] Verificar logs do navegador e console de erros
+- [ ] Corrigir o problema identificado
+- [ ] Testar o carrinho e confirmar o funcionamento
+
+## Bug Fix: Carrinho requer reload para mostrar itens
+- [x] Criar sistema de sincronização de carrinho com eventos
+- [x] Atualizar useCartSimple para usar eventos de sincronização
+- [x] Testar o carrinho em tempo real
+- [x] Corrigir número de WhatsApp no carrinho
+- [x] Salvar checkpoint com carrinho corrigido

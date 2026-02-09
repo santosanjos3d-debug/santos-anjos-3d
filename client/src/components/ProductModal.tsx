@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { X, ShoppingCart } from 'lucide-react';
-import { useCart } from '@/_core/hooks/useCart';
+import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 
 interface ProductColor {
   name: string;
@@ -40,7 +40,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
   const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0]?.value || 'white');
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0]?.size || 'P');
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
-  const { addItem } = useCart();
+  const { addItem } = useCartWithSync();
   const [addedToCart, setAddedToCart] = useState(false);
 
   if (!isOpen || !product) return null;
