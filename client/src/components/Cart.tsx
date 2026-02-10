@@ -2,11 +2,14 @@ import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import ShippingCalculator from './ShippingCalculator';
 
 export default function Cart() {
   const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCartWithSync();
   const [isOpen, setIsOpen] = useState(false);
   const [cep, setCep] = useState('');
+  const [shippingCost, setShippingCost] = useState(0);
+  const [shippingServiceName, setShippingServiceName] = useState('');
 
   const formatCEP = (value: string) => {
     const cleaned = value.replace(/\D/g, '');
@@ -14,10 +17,19 @@ export default function Cart() {
     return `${cleaned.slice(0, 5)}-${cleaned.slice(5, 8)}`;
   };
 
+  const handleShippingCalculated = (cost: number, serviceName: string) => {
+    setShippingCost(cost);
+    setShippingServiceName(serviceName);
+  };
+
   const handleCheckout = () => {
     if (cart.length === 0) return;
     if (!cep || cep.replace(/\D/g, '').length !== 8) {
       alert('Por favor, informe um CEP válido');
+      return;
+    }
+    if (shippingCost === 0) {
+      alert('Por favor, selecione uma opção de frete');
       return;
     }
 
@@ -29,7 +41,11 @@ export default function Cart() {
       .join('\n');
 
     const cleanCEP = cep.replace(/\D/g, '');
-    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n\nMeu CEP: ${cleanCEP}\n\nPor favor, calcule o frete e envie o valor total com o link de pagamento PIX.`;
+    const shippingFormatted = `R$ ${shippingCost.toFixed(2).replace('.', ',')}`;
+    const totalWithShipping = parseFloat(totalPriceFormatted.replace('R$ ', '').replace(',', '.')) + shippingCost;
+    const totalFormatted = `R$ ${totalWithShipping.toFixed(2).replace('.', ',')}`;
+    
+    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n*Frete (${shippingServiceName}): ${shippingFormatted}*\n*Total: ${totalFormatted}*\n\nMeu CEP: ${cleanCEP}\n\nPor favor, envie o link de pagamento PIX.`;
     const whatsappUrl = `https://wa.me/5547996641959?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -51,129 +67,121 @@ export default function Cart() {
 
       {/* Cart Sidebar */}
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-50 flex">
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="flex-1 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Cart Panel */}
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg z-50 flex flex-col">
+          <div className="w-full max-w-md bg-white shadow-lg flex flex-col max-h-screen overflow-hidden">
             {/* Header */}
-            <div className="bg-amber-500 text-white p-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold">Carrinho ({totalItems})</h2>
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-2xl font-bold">Carrinho</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="hover:bg-amber-600 p-1 rounded transition"
+                className="p-1 hover:bg-gray-100 rounded"
               >
                 <X size={24} />
               </button>
             </div>
 
-            {/* Items List */}
-            <div className="flex-1 overflow-y-auto p-4">
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
               {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                  <ShoppingCart size={48} className="mb-4 opacity-50" />
-                  <p>Seu carrinho está vazio</p>
-                </div>
+                <p className="text-gray-500 text-center py-8">Seu carrinho está vazio</p>
               ) : (
-                <div className="space-y-4">
-                  {cart.map((item: any) => (
-                    <div
-                      key={item.id}
-                      className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition"
-                    >
-                      <div className="flex gap-3">
-                        <img
-                          src={item.productImage}
-                          alt={item.productName}
-                          className="w-16 h-16 object-cover rounded"
-                        />
+                <>
+                  {/* Cart Items */}
+                  <div className="space-y-4 mb-6">
+                    {cart.map((item: any, index: number) => (
+                      <div key={index} className="flex gap-4 border rounded-lg p-4">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-sm">{item.productName}</h3>
-                          <p className="text-xs text-gray-600">
+                          <p className="font-semibold">{item.productName}</p>
+                          <p className="text-sm text-gray-600">
                             {item.color} • {item.sizeLabel}
                           </p>
-                          <p className="text-sm font-bold text-amber-600 mt-1">
-                            {item.price}
-                          </p>
+                          <p className="text-sm font-medium mt-2">{item.price}</p>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700 transition"
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-2 mt-3 justify-between">
-                        <div className="flex items-center gap-2 border border-gray-300 rounded">
+                        <div className="flex items-center gap-2">
                           <button
-                            onClick={() =>
-                              updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                            }
-                            className="p-1 hover:bg-gray-100 transition"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="p-1 hover:bg-gray-100 rounded"
                           >
                             <Minus size={16} />
                           </button>
-                          <span className="px-3 py-1 font-semibold">{item.quantity}</span>
+                          <span className="w-8 text-center">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 hover:bg-gray-100 transition"
+                            className="p-1 hover:bg-gray-100 rounded"
                           >
                             <Plus size={16} />
                           </button>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="p-1 hover:bg-red-100 rounded ml-2"
+                          >
+                            <X size={16} className="text-red-500" />
+                          </button>
                         </div>
-                        <span className="font-semibold text-sm">
-                          {`R$ ${(parseFloat(item.price.replace('R$', '').replace(',', '.')) * item.quantity).toFixed(2).replace('.', ',')}`}
-                        </span>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* CEP Input */}
+                  <div className="mb-6 border-t pt-6">
+                    <label className="block text-sm font-medium mb-2">CEP de Entrega</label>
+                    <input
+                      type="text"
+                      value={cep}
+                      onChange={(e) => setCep(formatCEP(e.target.value))}
+                      placeholder="00000-000"
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  {/* Shipping Calculator */}
+                  {cep.replace(/\D/g, '').length === 8 && (
+                    <ShippingCalculator
+                      cep={cep}
+                      cartItems={cart.map(item => ({ size: item.size, quantity: item.quantity }))}
+                      onShippingCalculated={handleShippingCalculated}
+                    />
+                  )}
+
+                  {/* Totals */}
+                  <div className="border-t pt-4 space-y-2 mt-6">
+                    <div className="flex justify-between text-base">
+                      <span>Subtotal:</span>
+                      <span>{totalPriceFormatted}</span>
                     </div>
-                  ))}
-                </div>
+                    {shippingCost > 0 && (
+                      <div className="flex justify-between text-base">
+                        <span>Frete:</span>
+                        <span>R$ {shippingCost.toFixed(2).replace('.', ',')}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                      <span>Total:</span>
+                      <span>
+                        {shippingCost > 0
+                          ? `R$ ${(parseFloat(totalPriceFormatted.replace('R$ ', '').replace(',', '.')) + shippingCost).toFixed(2).replace('.', ',')}`
+                          : totalPriceFormatted}
+                      </span>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Footer */}
             {cart.length > 0 && (
-              <div className="border-t border-gray-200 p-4 space-y-3">
-                {/* CEP Input */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    CEP de Entrega *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="00000-000"
-                    value={cep}
-                    onChange={(e) => setCep(formatCEP(e.target.value))}
-                    maxLength={9}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
-                  />
-                  {cep && cep.replace(/\D/g, '').length !== 8 && (
-                    <p className="text-xs text-red-600">CEP deve ter 8 dígitos</p>
-                  )}
-                </div>
-
-                {/* Totals */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-lg font-bold border-b pb-2">
-                    <span>Subtotal:</span>
-                    <span className="text-amber-600">{totalPriceFormatted}</span>
-                  </div>
-                  <p className="text-xs text-gray-600 italic">
-                    O frete será calculado após você informar seu CEP.
-                  </p>
-                </div>
-
-                {/* Buttons */}
+              <div className="border-t p-6 space-y-3">
                 <Button
                   onClick={handleCheckout}
-                  disabled={!cep || cep.replace(/\D/g, '').length !== 8}
-                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-3"
+                  disabled={!cep || cep.replace(/\D/g, '').length !== 8 || shippingCost === 0}
+                  className="w-full bg-green-600 hover:bg-green-700"
                 >
                   Encomendar via WhatsApp
                 </Button>
@@ -187,7 +195,7 @@ export default function Cart() {
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </>
   );

@@ -64,10 +64,11 @@
 - [x] Corrigir número de WhatsApp no carrinho
 - [x] Salvar checkpoint com carrinho corrigido
 
-## Novo Recurso: Calculador de Frete Integrado
-- [ ] Criar componente de cálculo de frete com input de CEP
-- [ ] Integrar API de frete (Correios ou similar)
-- [ ] Atualizar carrinho para incluir frete no total
-- [ ] Atualizar mensagem do WhatsApp com frete incluído
-- [ ] Testar cálculo de frete e mensagem
-- [ ] Salvar checkpoint com calculador de frete
+## Novo Recurso: Calculador de Frete Integrado (Melhor Envio API)
+- [x] Criar componente ShippingCalculator com integração Melhor Envio
+- [x] Integrar API do Melhor Envio no servidor (routers.ts)
+- [x] Atualizar carrinho para incluir cálculo de frete automático
+- [x] Atualizar mensagem do WhatsApp com frete incluído
+- [x] Implementar seleção de serviço de frete (PAC, SEDEX, etc.)
+- [x] Adicionar validação de CEP e opção de frete obrigatória
+- [ ] Publicar site para testar API em produção (DNS bloqueado no sandbox)

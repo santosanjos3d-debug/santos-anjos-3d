@@ -70,7 +70,7 @@ export async function calculateShipping(request: ShippingRequest): Promise<Shipp
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'User-Agent': 'Santos-Anjos-3D/1.0',
+          'User-Agent': 'Melhor Envio (giorgiotestoni@gmail.com)',
         },
       }
     );
@@ -114,6 +114,7 @@ export async function validateCredentials(): Promise<boolean> {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'User-Agent': 'Melhor Envio (giorgiotestoni@gmail.com)',
         },
       }
     );
