@@ -17,7 +17,7 @@ export default function Cart() {
       )
       .join('\n');
 
-    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\nTotal: ${totalPriceFormatted}`;
+    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n\nPor favor, confirme o frete para meu CEP e o valor total.`;
     const whatsappUrl = `https://wa.me/5547996641959?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -128,10 +128,16 @@ export default function Cart() {
             {/* Footer */}
             {cart.length > 0 && (
               <div className="border-t border-gray-200 p-4 space-y-3">
-                <div className="flex justify-between items-center text-lg font-bold">
-                  <span>Total:</span>
-                  <span className="text-amber-600">{totalPriceFormatted}</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-lg font-bold border-b pb-2">
+                    <span>Subtotal:</span>
+                    <span className="text-amber-600">{totalPriceFormatted}</span>
+                  </div>
+                  <p className="text-xs text-gray-600 italic">
+                    O frete será calculado após você informar seu CEP no WhatsApp.
+                  </p>
                 </div>
+
                 <Button
                   onClick={handleCheckout}
                   className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3"

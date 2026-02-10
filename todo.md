@@ -63,3 +63,11 @@
 - [x] Testar o carrinho em tempo real
 - [x] Corrigir número de WhatsApp no carrinho
 - [x] Salvar checkpoint com carrinho corrigido
+
+## Novo Recurso: Calculador de Frete Integrado
+- [ ] Criar componente de cálculo de frete com input de CEP
+- [ ] Integrar API de frete (Correios ou similar)
+- [ ] Atualizar carrinho para incluir frete no total
+- [ ] Atualizar mensagem do WhatsApp com frete incluído
+- [ ] Testar cálculo de frete e mensagem
+- [ ] Salvar checkpoint com calculador de frete
