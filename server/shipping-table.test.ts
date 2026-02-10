@@ -13,7 +13,7 @@ describe('Shipping Table', () => {
   it('should calculate shipping for size P in SC', () => {
     const result = calculateShippingByTable('89227320', 'P');
     
-    expect(result.services).toHaveLength(2);
+    expect(result.services).toHaveLength(3); // PAC, SEDEX, Retirada
     expect(result.services[0].name).toBe('PAC');
     expect(result.services[0].price).toBe(18.76); // +10%
     expect(result.services[0].deliveryTime).toBe(7); // +2 days (was 5)
@@ -25,7 +25,7 @@ describe('Shipping Table', () => {
   it('should calculate shipping for size M in SP', () => {
     const result = calculateShippingByTable('01310100', 'M');
     
-    expect(result.services).toHaveLength(2);
+    expect(result.services).toHaveLength(3); // PAC, SEDEX, Retirada
     expect(result.services[0].name).toBe('PAC');
     expect(result.services[0].price).toBe(32.06); // +10%
     expect(result.services[1].name).toBe('SEDEX');
@@ -35,7 +35,7 @@ describe('Shipping Table', () => {
   it('should calculate shipping for size G in RJ', () => {
     const result = calculateShippingByTable('20040020', 'G');
     
-    expect(result.services).toHaveLength(2);
+    expect(result.services).toHaveLength(3); // PAC, SEDEX, Retirada
     expect(result.services[0].price).toBe(42.35); // +10%
     expect(result.services[1].price).toBe(66.55); // +10%
   });
@@ -43,7 +43,7 @@ describe('Shipping Table', () => {
   it('should fallback to SP prices for unknown CEP', () => {
     const result = calculateShippingByTable('99999999', 'P');
     
-    expect(result.services).toHaveLength(2);
+    expect(result.services).toHaveLength(3); // PAC, SEDEX, Retirada
     // CEP 99 maps to RS, not unknown
     expect(result.services[0].price).toBeGreaterThan(0);
     expect(result.services[0].company).toBe('Correios');
@@ -58,7 +58,16 @@ describe('Shipping Table', () => {
       expect(service).toHaveProperty('price');
       expect(service).toHaveProperty('deliveryTime');
       expect(service).toHaveProperty('company');
-      expect(service.company).toBe('Correios');
     });
+  });
+
+  it('should include local pickup option with zero price', () => {
+    const result = calculateShippingByTable('89227320', 'P');
+    
+    expect(result.services).toHaveLength(3);
+    const localPickup = result.services.find(s => s.name === 'Retirar no Local');
+    expect(localPickup).toBeDefined();
+    expect(localPickup?.price).toBe(0);
+    expect(localPickup?.deliveryTime).toBe(0);
   });
 });

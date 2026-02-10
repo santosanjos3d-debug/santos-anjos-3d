@@ -143,7 +143,7 @@ export function getRegionFromCEP(cep: string): string {
   return CEP_REGIONS[prefix] || 'SP'; // Default to SP if not found
 }
 
-export function calculateShippingByTable(cep: string, size: 'P' | 'M' | 'G'): {
+export function calculateShippingByTable(cep: string, size: 'P' | 'M' | 'G', includeLocalPickup: boolean = true): {
   services: Array<{
     id: number;
     name: string;
@@ -174,6 +174,13 @@ export function calculateShippingByTable(cep: string, size: 'P' | 'M' | 'G'): {
           deliveryTime: spRates.sedex.days,
           company: 'Correios',
         },
+        {
+          id: 3,
+          name: 'Retirar no Local',
+          price: 0,
+          deliveryTime: 0,
+          company: 'Retirada em Mãos',
+        },
       ],
     };
   }
@@ -193,6 +200,13 @@ export function calculateShippingByTable(cep: string, size: 'P' | 'M' | 'G'): {
         price: rates.sedex.price,
         deliveryTime: rates.sedex.days,
         company: 'Correios',
+      },
+      {
+        id: 3,
+        name: 'Retirar no Local',
+        price: 0,
+        deliveryTime: 0,
+        company: 'Retirada em Mãos',
       },
     ],
   };

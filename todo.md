@@ -87,3 +87,9 @@
 - [x] Adicionar 2 dias úteis em todos os prazos de entrega
 - [x] Testar cálculo com novos valores
 - [ ] Salvar checkpoint com tabela atualizada
+
+## Feature: Retirar no Local
+- [x] Adicionar opção de retirada à tabela de frete (R$ 0,00)
+- [x] Atualizar ShippingCalculator para exibir retirada
+- [x] Testar opção de retirada funcionando
+- [x] Salvar checkpoint com retirada implementada
