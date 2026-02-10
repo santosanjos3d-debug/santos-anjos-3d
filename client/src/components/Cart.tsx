@@ -6,9 +6,20 @@ import { useState } from 'react';
 export default function Cart() {
   const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCartWithSync();
   const [isOpen, setIsOpen] = useState(false);
+  const [cep, setCep] = useState('');
+
+  const formatCEP = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 5) return cleaned;
+    return `${cleaned.slice(0, 5)}-${cleaned.slice(5, 8)}`;
+  };
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    if (!cep || cep.replace(/\D/g, '').length !== 8) {
+      alert('Por favor, informe um CEP válido');
+      return;
+    }
 
     // Build message with all cart items
     const cartSummary = cart
@@ -17,7 +28,8 @@ export default function Cart() {
       )
       .join('\n');
 
-    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n\nPor favor, confirme o frete para meu CEP e o valor total.`;
+    const cleanCEP = cep.replace(/\D/g, '');
+    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n\nMeu CEP: ${cleanCEP}\n\nPor favor, calcule o frete e envie o valor total com o link de pagamento PIX.`;
     const whatsappUrl = `https://wa.me/5547996641959?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -128,19 +140,40 @@ export default function Cart() {
             {/* Footer */}
             {cart.length > 0 && (
               <div className="border-t border-gray-200 p-4 space-y-3">
+                {/* CEP Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    CEP de Entrega *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="00000-000"
+                    value={cep}
+                    onChange={(e) => setCep(formatCEP(e.target.value))}
+                    maxLength={9}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
+                  />
+                  {cep && cep.replace(/\D/g, '').length !== 8 && (
+                    <p className="text-xs text-red-600">CEP deve ter 8 dígitos</p>
+                  )}
+                </div>
+
+                {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-lg font-bold border-b pb-2">
                     <span>Subtotal:</span>
                     <span className="text-amber-600">{totalPriceFormatted}</span>
                   </div>
                   <p className="text-xs text-gray-600 italic">
-                    O frete será calculado após você informar seu CEP no WhatsApp.
+                    O frete será calculado após você informar seu CEP.
                   </p>
                 </div>
 
+                {/* Buttons */}
                 <Button
                   onClick={handleCheckout}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3"
+                  disabled={!cep || cep.replace(/\D/g, '').length !== 8}
+                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-3"
                 >
                   Encomendar via WhatsApp
                 </Button>
