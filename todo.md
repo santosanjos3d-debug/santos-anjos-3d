@@ -72,3 +72,11 @@
 - [x] Implementar seleção de serviço de frete (PAC, SEDEX, etc.)
 - [x] Adicionar validação de CEP e opção de frete obrigatória
 - [ ] Publicar site para testar API em produção (DNS bloqueado no sandbox)
+
+## Bug Fix: Erro DNS em Produção (api.melhorenvio.com.br)
+- [x] Investigar erro ENOTFOUND em produção
+- [x] Verificar configuração de DNS/rede do servidor
+- [x] Testar conexão direta com API do Melhor Envio
+- [x] Implementar tabela de frete por região como solução alternativa
+- [x] Criar testes unitários para tabela de frete
+- [x] Validar cálculo de frete funcionando

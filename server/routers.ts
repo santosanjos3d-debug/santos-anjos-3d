@@ -6,6 +6,7 @@ import { z } from "zod";
 import { getAllProducts, getProductById, createOrder, getOrderByNumber, getAllOrders, updateOrderStatus, calculateShippingCost, initializeShippingRates } from "./db";
 import { nanoid } from "nanoid";
 import { calculateShipping } from "./melhorenvio";
+import { calculateShippingByTable } from "./shipping-table";
 
 export const appRouter = router({
   system: systemRouter,
@@ -49,36 +50,13 @@ export const appRouter = router({
           G: { width: 15, height: 15, length: 30, weight: 250 },
         };
 
-        const dimensions = sizeMap[input.sizeType];
-
         try {
-          const result = await calculateShipping({
-            destinationCEP: input.destinationCEP,
-            weight: dimensions.weight,
-            height: dimensions.height,
-            width: dimensions.width,
-            length: dimensions.length,
-          });
-
-          if (result.error) {
-            return {
-              success: false,
-              error: result.error,
-              services: [],
-            };
-          }
-
-          const services = result.services.map((service) => ({
-            id: service.id,
-            name: service.name,
-            price: service.price,
-            deliveryTime: service.delivery_time,
-            company: service.company.name,
-          }));
+          // Use shipping table instead of API
+          const result = calculateShippingByTable(input.destinationCEP, input.sizeType);
 
           return {
             success: true,
-            services,
+            services: result.services,
           };
         } catch (error: any) {
           console.error('[Shipping Router] Error:', error);
