@@ -15,11 +15,11 @@ describe('Shipping Table', () => {
     
     expect(result.services).toHaveLength(2);
     expect(result.services[0].name).toBe('PAC');
-    expect(result.services[0].price).toBe(15.50);
-    expect(result.services[0].deliveryTime).toBe(3);
+    expect(result.services[0].price).toBe(18.76); // +10%
+    expect(result.services[0].deliveryTime).toBe(7); // +2 days (was 5)
     expect(result.services[1].name).toBe('SEDEX');
-    expect(result.services[1].price).toBe(25.00);
-    expect(result.services[1].deliveryTime).toBe(1);
+    expect(result.services[1].price).toBe(30.25); // +10%
+    expect(result.services[1].deliveryTime).toBe(5); // +2 days (was 3)
   });
 
   it('should calculate shipping for size M in SP', () => {
@@ -27,17 +27,17 @@ describe('Shipping Table', () => {
     
     expect(result.services).toHaveLength(2);
     expect(result.services[0].name).toBe('PAC');
-    expect(result.services[0].price).toBe(26.50);
+    expect(result.services[0].price).toBe(32.06); // +10%
     expect(result.services[1].name).toBe('SEDEX');
-    expect(result.services[1].price).toBe(42.00);
+    expect(result.services[1].price).toBe(50.82); // +10%
   });
 
   it('should calculate shipping for size G in RJ', () => {
     const result = calculateShippingByTable('20040020', 'G');
     
     expect(result.services).toHaveLength(2);
-    expect(result.services[0].price).toBe(35.00);
-    expect(result.services[1].price).toBe(55.00);
+    expect(result.services[0].price).toBe(42.35); // +10%
+    expect(result.services[1].price).toBe(66.55); // +10%
   });
 
   it('should fallback to SP prices for unknown CEP', () => {

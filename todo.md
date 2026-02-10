@@ -80,3 +80,10 @@
 - [x] Implementar tabela de frete por região como solução alternativa
 - [x] Criar testes unitários para tabela de frete
 - [x] Validar cálculo de frete funcionando
+
+## Atualização: Preços e Prazos Reais de Frete
+- [x] Fazer cotações reais nos Correios para os 3 tamanhos (P, M, G)
+- [x] Aumentar todos os valores em 10%
+- [x] Adicionar 2 dias úteis em todos os prazos de entrega
+- [x] Testar cálculo com novos valores
+- [ ] Salvar checkpoint com tabela atualizada
