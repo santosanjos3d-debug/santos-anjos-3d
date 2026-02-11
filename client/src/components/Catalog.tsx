@@ -206,7 +206,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 10,
-    name: 'São Miguel Pequeno',
+    name: 'São Miguel',
     category: 'Arcanjos',
     image: '/images/sao-miguel-medio-edited.png',
     description: 'São Miguel Arcanjo em postura triunfante sobre o demônio.',
@@ -224,24 +224,6 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 11,
-    name: 'São Miguel Médio',
-    category: 'Arcanjos',
-    image: '/images/sao-miguel-medio-edited.png',
-    description: 'São Miguel Arcanjo em postura triunfante sobre o demônio.',
-    details: 'Impressão 3D em PETG com filamento fundido. São Miguel é representado como protetor e guerreiro espiritual, com asas majestosas e lança. Símbolo de vitória sobre o mal.',
-    price: '103,27',
-    sizes: [
-      { size: 'P', label: 'Pequeno (188mm)', price: '103,27' },
-      { size: 'M', label: 'Médio (282mm)', price: '103,27' },
-    ],
-    colors: [
-      { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
-      { name: 'Marrom', value: 'brown', image: '/images/sao-miguel-medio-edited.png' },
-      { name: 'Verde', value: 'green', image: '/images/sao-miguel-medio-edited.png' },
-    ],
-  },
-  {
-    id: 12,
     name: 'Nossa Senhora de Lourdes Grande - Branca',
     category: 'Nossa Senhora',
     image: '/images/sagrado-coracao-maria-edited.png',
