@@ -105,3 +105,10 @@
 - [x] Atualizar preços de todos os produtos no Catalog.tsx
 - [x] Testar preços atualizados no site
 - [x] Salvar checkpoint com preços atualizados
+
+
+## UI Fix: Remover Fundo Branco do Logo
+- [x] Localizar arquivo do logo
+- [x] Remover fundo branco e deixar transparente
+- [x] Testar logo no site
+- [x] Salvar checkpoint com logo atualizado
