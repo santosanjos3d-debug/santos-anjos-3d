@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, name FROM products;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4MHZiezXmddxnYm.3f6f84606b5a --database gVH8PYB7a8FdTTui9CMfPj --execute SELECT id, name FROM products;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nossa Senhora de Lourdes"
+    },
+    {
+      "id": "2",
+      "name": "Sagrado Coração de Maria"
+    },
+    {
+      "id": "3",
+      "name": "Santa Hildegarda de Bingen"
+    },
+    {
+      "id": "4",
+      "name": "São Francisco de Assis"
+    },
+    {
+      "id": "5",
+      "name": "São José com Menino Jesus"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tNossa Senhora de Lourdes\n2\tSagrado Coração de Maria\n3\tSanta Hildegarda de Bingen\n4\tSão Francisco de Assis\n5\tSão José com Menino Jesus\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

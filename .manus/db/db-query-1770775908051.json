@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, name, category FROM products LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4MHZiezXmddxnYm.3f6f84606b5a --database gVH8PYB7a8FdTTui9CMfPj --execute SELECT id, name, category FROM products LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nossa Senhora de Lourdes",
+      "category": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "Sagrado Coração de Maria",
+      "category": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "Santa Hildegarda de Bingen",
+      "category": "NULL"
+    },
+    {
+      "id": "4",
+      "name": "São Francisco de Assis",
+      "category": "NULL"
+    },
+    {
+      "id": "5",
+      "name": "São José com Menino Jesus",
+      "category": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcategory\n1\tNossa Senhora de Lourdes\tNULL\n2\tSagrado Coração de Maria\tNULL\n3\tSanta Hildegarda de Bingen\tNULL\n4\tSão Francisco de Assis\tNULL\n5\tSão José com Menino Jesus\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

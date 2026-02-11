@@ -93,3 +93,8 @@
 - [x] Atualizar ShippingCalculator para exibir retirada
 - [x] Testar opção de retirada funcionando
 - [x] Salvar checkpoint com retirada implementada
+## Bug Fix: Remover tamanho Grande (G) do São Miguel
+- [x] Remover opção de tamanho G do São Miguel
+- [x] Manter apenas P e M para este produto
+- [x] Testar mudança no carrinho
+- [x] Salvar checkpoint com mudança

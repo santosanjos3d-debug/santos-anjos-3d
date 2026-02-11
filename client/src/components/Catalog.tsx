@@ -215,7 +215,6 @@ const PRODUCTS: Product[] = [
     sizes: [
       { size: 'P', label: 'Pequeno (94mm)', price: '44,28' },
       { size: 'M', label: 'Médio (188mm)', price: '77,49' },
-      { size: 'G', label: 'Grande (282mm)', price: '110,70' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
@@ -234,7 +233,6 @@ const PRODUCTS: Product[] = [
     sizes: [
       { size: 'P', label: 'Pequeno (188mm)', price: '77,45' },
       { size: 'M', label: 'Médio (282mm)', price: '135,53' },
-      { size: 'G', label: 'Grande (376mm)', price: '193,63' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
