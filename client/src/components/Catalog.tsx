@@ -40,11 +40,11 @@ const PRODUCTS: Product[] = [
     image: '/images/sagrado-coracao-maria-edited.png',
     description: 'Estatueta de Nossa Senhora de Lourdes em PETG com filamento fundido, branca com detalhes delicados.',
     details: 'Impressão 3D de alta qualidade em PETG com filamento fundido. Cada detalhe foi cuidadosamente capturado para refletir a beleza e serenidade de Nossa Senhora de Lourdes, padroeira dos doentes.',
-    price: '29,33',
+    price: '23,68',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '29,33' },
-      { size: 'M', label: 'Médio (216mm)', price: '51,18' },
-      { size: 'G', label: 'Grande (288mm)', price: '73,13' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '23,68' },
+      { size: 'M', label: 'Médio (216mm)', price: '41,03' },
+      { size: 'G', label: 'Grande (288mm)', price: '68,70' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
@@ -59,11 +59,11 @@ const PRODUCTS: Product[] = [
     image: '/images/nossa-senhora-lourdes-edited.png',
     description: 'Representação do Sagrado Coração de Maria em PETG com filamento fundido, branca.',
     details: 'Impressão 3D em PETG com filamento fundido de alta qualidade. Captura a devoção e amor do Sagrado Coração de Maria com detalhes precisos e acabamento fino.',
-    price: '40,85',
+    price: '32,68',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '40,85' },
-      { size: 'M', label: 'Médio (216mm)', price: '71,49' },
-      { size: 'G', label: 'Grande (288mm)', price: '102,13' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '32,68' },
+      { size: 'M', label: 'Médio (216mm)', price: '73,45' },
+      { size: 'G', label: 'Grande (288mm)', price: '103,30' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/nossa-senhora-lourdes-edited.png' },
@@ -78,11 +78,11 @@ const PRODUCTS: Product[] = [
     image: '/images/santa-gianna-edited.png',
     description: 'Santa Gianna em representação serena e contemplativa.',
     details: 'Impressão 3D em PETG com filamento fundido de Santa Gianna, mãe e santa moderna. Peça inspiradora para famílias cristãs.',
-    price: '43,18',
+    price: '49,50',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '43,18' },
-      { size: 'M', label: 'Médio (216mm)', price: '75,57' },
-      { size: 'G', label: 'Grande (288mm)', price: '107,95' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '49,50' },
+      { size: 'M', label: 'Médio (216mm)', price: '89,38' },
+      { size: 'G', label: 'Grande (288mm)', price: '161,90' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/santa-gianna-edited.png' },
@@ -97,11 +97,11 @@ const PRODUCTS: Product[] = [
     image: '/images/santa-hildegarda-bingen-edited.png',
     description: 'Santa Hildegarda de Bingen com palma e livro, símbolo de sabedoria.',
     details: 'Impressão 3D em PETG com filamento fundido. Santa Hildegarda é representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Peça de grande significado espiritual.',
-    price: '40,58',
+    price: '43,88',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '40,58' },
-      { size: 'M', label: 'Médio (216mm)', price: '71,01' },
-      { size: 'G', label: 'Grande (288mm)', price: '101,45' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '43,88' },
+      { size: 'M', label: 'Médio (216mm)', price: '107,68' },
+      { size: 'G', label: 'Grande (288mm)', price: '172,28' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/santa-hildegarda-bingen-edited.png' },
@@ -119,8 +119,8 @@ const PRODUCTS: Product[] = [
     price: '35,10',
     sizes: [
       { size: 'P', label: 'Pequeno (144mm)', price: '35,10' },
-      { size: 'M', label: 'Médio (216mm)', price: '61,43' },
-      { size: 'G', label: 'Grande (288mm)', price: '87,75' },
+      { size: 'M', label: 'Médio (216mm)', price: '59,00' },
+      { size: 'G', label: 'Grande (288mm)', price: '109,25' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-francisco-assis-edited.png' },
@@ -138,8 +138,8 @@ const PRODUCTS: Product[] = [
     price: '39,38',
     sizes: [
       { size: 'P', label: 'Pequeno (144mm)', price: '39,38' },
-      { size: 'M', label: 'Médio (216mm)', price: '68,92' },
-      { size: 'G', label: 'Grande (288mm)', price: '98,45' },
+      { size: 'M', label: 'Médio (216mm)', price: '75,45' },
+      { size: 'G', label: 'Grande (288mm)', price: '120,20' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-jose-menino-jesus-real-edited.png' },
@@ -152,13 +152,13 @@ const PRODUCTS: Product[] = [
     name: 'Santo Antônio',
     category: 'Santos',
     image: '/images/santo-antonio-edited.png',
-    description: 'Santo Antônio com o Menino Jesus, santo do amor e da família.',
-    details: 'Impressão 3D em PETG com filamento fundido. Santo Antônio é representado com o Menino Jesus em seus braços, simbolizando proteção, amor e fé. Peça tradicional muito venerada.',
+    description: 'Santo Antônio com o Menino Jesus, santo protetor dos perdidos.',
+    details: 'Impressão 3D em PETG com filamento fundido. Santo Antônio é representado com o Menino Jesus, símbolo de sua devoção e seu papel como protetor dos perdidos e das causas impossíveis.',
     price: '32,43',
     sizes: [
       { size: 'P', label: 'Pequeno (144mm)', price: '32,43' },
-      { size: 'M', label: 'Médio (216mm)', price: '56,75' },
-      { size: 'G', label: 'Grande (288mm)', price: '81,08' },
+      { size: 'M', label: 'Médio (216mm)', price: '47,08' },
+      { size: 'G', label: 'Grande (288mm)', price: '81,90' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/santo-antonio-edited.png' },
@@ -171,13 +171,13 @@ const PRODUCTS: Product[] = [
     name: 'São Bento',
     category: 'Santos',
     image: '/images/sao-bento-edited.png',
-    description: 'São Bento em vestes monásticas, fundador da ordem beneditina.',
-    details: 'Impressão 3D em PETG com filamento fundido. São Bento é representado em suas vestes monásticas, com a cruz e o livro de sua regra. Símbolo de sabedoria espiritual e vida contemplativa.',
+    description: 'São Bento com sua cruz e livro, santo protetor contra o mal.',
+    details: 'Impressão 3D em PETG com filamento fundido. São Bento é representado com seus símbolos característicos: a cruz de São Bento e o livro da Regra. Peça de grande poder espiritual.',
     price: '39,15',
     sizes: [
       { size: 'P', label: 'Pequeno (144mm)', price: '39,15' },
-      { size: 'M', label: 'Médio (216mm)', price: '68,51' },
-      { size: 'G', label: 'Grande (288mm)', price: '97,88' },
+      { size: 'M', label: 'Médio (216mm)', price: '66,95' },
+      { size: 'G', label: 'Grande (288mm)', price: '118,25' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-bento-edited.png' },
@@ -187,16 +187,16 @@ const PRODUCTS: Product[] = [
   },
   {
     id: 9,
-    name: 'São José Josemaria',
+    name: 'São Josemaria',
     category: 'Santos',
     image: '/images/sao-josemaria-edited.png',
-    description: 'São Josemaria em representação serena e contemplativa.',
-    details: 'Impressão 3D em PETG com filamento fundido de São Josemaria. Fundador do Opus Dei, representa a santidade na vida ordinária. Peça inspiradora para leigos cristãos.',
-    price: '29,13',
+    description: 'São Josemaria Escrivá, fundador do Opus Dei.',
+    details: 'Impressão 3D em PETG com filamento fundido. São Josemaria é representado em sua postura característica, refletindo sua missão de santificar o trabalho ordinário e a vida cotidiana.',
+    price: '45,53',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '29,13' },
-      { size: 'M', label: 'Médio (216mm)', price: '50,98' },
-      { size: 'G', label: 'Grande (288mm)', price: '72,83' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '45,53' },
+      { size: 'M', label: 'Médio (216mm)', price: '70,95' },
+      { size: 'G', label: 'Grande (288mm)', price: '128,95' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-josemaria-edited.png' },
@@ -214,7 +214,7 @@ const PRODUCTS: Product[] = [
     price: '44,28',
     sizes: [
       { size: 'P', label: 'Pequeno (94mm)', price: '44,28' },
-      { size: 'M', label: 'Médio (188mm)', price: '77,49' },
+      { size: 'M', label: 'Médio (188mm)', price: '77,45' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
@@ -232,7 +232,7 @@ const PRODUCTS: Product[] = [
     price: '77,45',
     sizes: [
       { size: 'P', label: 'Pequeno (188mm)', price: '77,45' },
-      { size: 'M', label: 'Médio (282mm)', price: '135,53' },
+      { size: 'M', label: 'Médio (282mm)', price: '77,45' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.png' },
@@ -247,11 +247,11 @@ const PRODUCTS: Product[] = [
     image: '/images/sagrado-coracao-maria-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor branca.',
     details: 'Impressão 3D em PETG com filamento fundido branca de Nossa Senhora de Lourdes em tamanho maior. Ideal para capelas e espaços maiores. Versão clássica em branco puro.',
-    price: '73,13',
+    price: '68,70',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '29,33' },
-      { size: 'M', label: 'Médio (216mm)', price: '51,18' },
-      { size: 'G', label: 'Grande (288mm)', price: '73,13' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '23,68' },
+      { size: 'M', label: 'Médio (216mm)', price: '41,03' },
+      { size: 'G', label: 'Grande (288mm)', price: '68,70' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
@@ -266,11 +266,11 @@ const PRODUCTS: Product[] = [
     image: '/images/nossa-senhora-lourdes-grande-marrom-real-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor marrom.',
     details: 'Impressão 3D em PETG com filamento fundido marrom de Nossa Senhora de Lourdes em tamanho maior. Versão em tom madeira quente, ideal para ambientes com decoração rústica.',
-    price: '73,13',
+    price: '68,70',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '29,33' },
-      { size: 'M', label: 'Médio (216mm)', price: '51,18' },
-      { size: 'G', label: 'Grande (288mm)', price: '73,13' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '23,68' },
+      { size: 'M', label: 'Médio (216mm)', price: '41,03' },
+      { size: 'G', label: 'Grande (288mm)', price: '68,70' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
@@ -284,12 +284,12 @@ const PRODUCTS: Product[] = [
     category: 'Nossa Senhora',
     image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png',
     description: 'Nossa Senhora de Lourdes em tamanho grande, cor verde.',
-    details: 'Impressão 3D em PETG com filamento fundido verde de Nossa Senhora de Lourdes em tamanho maior. Versão em tom verde natural, trazendo frescor e conexão com a natureza.',
-    price: '73,13',
+    details: 'Impressão 3D em PETG com filamento fundido verde de Nossa Senhora de Lourdes em tamanho maior. Versão em tom verde esperança, perfeita para ambientes com decoração moderna.',
+    price: '68,70',
     sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '29,33' },
-      { size: 'M', label: 'Médio (216mm)', price: '51,18' },
-      { size: 'G', label: 'Grande (288mm)', price: '73,13' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '23,68' },
+      { size: 'M', label: 'Médio (216mm)', price: '41,03' },
+      { size: 'G', label: 'Grande (288mm)', price: '68,70' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sagrado-coracao-maria-edited.png' },
@@ -297,42 +297,35 @@ const PRODUCTS: Product[] = [
       { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png' },
     ],
   },
-  {
-    id: 15,
-    name: 'Santa Hildegarda Verde',
-    category: 'Santas',
-    image: '/images/santa-hildegarda-verde-edited.png',
-    description: 'Santa Hildegarda em filamento PETG verde, com palma e livro.',
-    details: 'Impressão 3D em PETG com filamento fundido verde de Santa Hildegarda de Bingen. Representada com seus símbolos característicos: a palma do martírio e o livro de seus escritos. Versão em tom verde vibrante, trazendo frescor espiritual.',
-    price: '40,58',
-    sizes: [
-      { size: 'P', label: 'Pequeno (144mm)', price: '40,58' },
-      { size: 'M', label: 'Médio (216mm)', price: '71,01' },
-      { size: 'G', label: 'Grande (288mm)', price: '101,45' },
-    ],
-    colors: [
-      { name: 'Branco', value: 'white', image: '/images/santa-hildegarda-bingen-edited.png' },
-      { name: 'Marrom', value: 'brown', image: '/images/santa-hildegarda-bingen-edited.png' },
-      { name: 'Verde', value: 'green', image: '/images/santa-hildegarda-verde-edited.png' },
-    ],
-  },
 ];
 
 export default function Catalog() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedProduct(undefined), 300);
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Catálogo de Peças
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cada peça é uma obra de arte cuidadosamente impressa em 3D, celebrando a fé e a espiritualidade com detalhes extraordinários.
-          </p>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-accent/5 to-background py-12 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl font-bold text-foreground mb-4">Catálogo de Produtos</h1>
+          <p className="text-lg text-foreground/70">Cada peça é uma obra de arte cuidadosamente impressa em 3D</p>
         </div>
+      </div>
 
+      {/* Products Grid */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {PRODUCTS.map((product) => (
             <ProductCard
@@ -343,16 +336,17 @@ export default function Catalog() {
               image={product.image}
               description={product.description}
               price={product.price}
-              onDetailsClick={() => setSelectedProduct(product)}
+              onDetailsClick={() => handleProductClick(product)}
             />
           ))}
         </div>
       </div>
 
+      {/* Product Modal */}
       <ProductModal
-        isOpen={selectedProduct !== null}
-        product={selectedProduct || undefined}
-        onClose={() => setSelectedProduct(null)}
+        isOpen={isModalOpen}
+        product={selectedProduct}
+        onClose={handleCloseModal}
       />
     </div>
   );

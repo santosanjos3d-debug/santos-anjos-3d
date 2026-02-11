@@ -98,3 +98,10 @@
 - [x] Manter apenas P e M para este produto
 - [x] Testar mudança no carrinho
 - [x] Salvar checkpoint com mudança
+
+
+## Feature: Atualizar Preços com Margem de 60%
+- [x] Processar tabela de custos fornecida
+- [x] Atualizar preços de todos os produtos no Catalog.tsx
+- [x] Testar preços atualizados no site
+- [x] Salvar checkpoint com preços atualizados
