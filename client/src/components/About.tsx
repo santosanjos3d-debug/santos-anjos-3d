@@ -30,15 +30,19 @@ export default function About() {
 
             <div className="space-y-4 text-foreground/80 leading-relaxed">
               <p>
-                A <span className="font-semibold text-foreground">Santos Anjos 3D</span> nasceu da paixão por unir tradição espiritual com inovação tecnológica. Cada peça é impressa em 3D com precisão extraordinária, capturando os detalhes mais delicados das representações sagradas.
+                A <span className="font-semibold text-foreground">Santos Anjos 3D</span> foi criada com o propósito de integrar tradição religiosa e tecnologia de fabricação digital. Desenvolvemos imagens sacras por meio de impressão 3D de alta precisão, assegurando fidelidade nos detalhes e consistência dimensional em cada peça.
               </p>
 
               <p>
-                Utilizamos resina de alta qualidade e técnicas avançadas de impressão 3D para criar estatuetas que não são apenas belas, mas também duráveis e significativas. Cada santo é uma obra de arte que traz proteção e inspiração para seu lar.
+                Utilizamos Polietileno Tereftalato Glicol (PETG), um polímero termoplástico amplamente empregado na indústria por sua resistência mecânica, estabilidade e durabilidade. No contexto da impressão 3D, o PETG oferece boa definição geométrica, baixa retração e excelente desempenho estrutural, resultando em peças robustas e com acabamento uniforme.
               </p>
 
               <p>
-                Acreditamos que a fé merece ser celebrada com qualidade e elegância. Por isso, dedicamos tempo e cuidado em cada detalhe, desde a modelagem até o acabamento final.
+                Cada modelo é cuidadosamente preparado em ambiente digital, passando por etapas de ajuste, validação e otimização antes da fabricação. O processo produtivo é conduzido com controle técnico, garantindo qualidade, repetibilidade e integridade da peça final.
+              </p>
+
+              <p>
+                Nosso compromisso é oferecer representações religiosas produzidas com rigor técnico, materiais adequados e acabamento consistente, respeitando tanto o significado simbólico quanto os critérios de qualidade do produto.
               </p>
             </div>
 
