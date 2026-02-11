@@ -11,7 +11,7 @@ export default function Header() {
         {/* Logo/Branding */}
         <div className="flex items-center gap-3">
           <img 
-            src="/images/logo-simplified.png" 
+            src="/images/logo-simplified.png?v=2" 
             alt="Santos Anjos 3D Logo" 
             className="w-10 h-10 flex-shrink-0"
           />
