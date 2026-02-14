@@ -279,6 +279,24 @@ const PRODUCTS: Product[] = [
       { name: 'Verde', value: 'green', image: '/images/nossa-senhora-lourdes-grande-verde-real-edited.png' },
     ],
   },
+  {
+    id: 15,
+    name: 'Santa Teresa d\'Ávila',
+    category: 'Santas',
+    image: '/images/santa-teresa-avila-branca.png',
+    description: 'Santa Teresa d\'Ávila em representação contemplativa e mística.',
+    details: 'Santa Teresa d\'Ávila (1515-1582) foi uma mística espanhola, reformadora da Ordem Carmelita e Doutora da Igreja. Conhecida por seus escritos espirituais profundos e sua vida dedicada à oração contemplativa. Esta peça em impressão 3D captura a serenidade e a devoção da santa, ideal para ambientes de meditação e oração. Disponível em branco e marrom terracota.',
+    price: '59,03',
+    sizes: [
+      { size: 'P', label: 'Pequeno (144mm)', price: '59,03' },
+      { size: 'M', label: 'Médio (216mm)', price: '103,27' },
+      { size: 'G', label: 'Grande (288mm)', price: '171,93' },
+    ],
+    colors: [
+      { name: 'Branco', value: 'white', image: '/images/santa-teresa-avila-branca.png' },
+      { name: 'Marrom', value: 'brown', image: '/images/santa-teresa-avila-marrom.png' },
+    ],
+  },
 ];
 
 export default function Catalog() {
