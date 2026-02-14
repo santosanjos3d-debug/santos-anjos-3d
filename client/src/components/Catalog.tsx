@@ -283,8 +283,8 @@ const PRODUCTS: Product[] = [
     id: 15,
     name: 'Santa Teresa d\'Ávila',
     category: 'Santas',
-    image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/jiUPuHIkbgaLssUS.jpeg',
-    description: 'Santa Teresa d\'Ávila em representação contemplativa, disponível em branco e terracota.',
+    image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/viiQeDaQAudvuwkl.png',
+    description: 'Santa Teresa d\'Ávila em representação contemplativa, disponível em branco e marrom.',
     details: 'Impressão 3D em PETG com filamento fundido de Santa Teresa d\'Ávila, a grande mística e reformadora do Carmelo. Conhecida por sua profunda espiritualidade e seus escritos sobre a vida interior. Peça inspiradora para aqueles que buscam aprofundar sua vida de oração e contemplação.',
     price: '63,90',
     sizes: [
@@ -293,9 +293,9 @@ const PRODUCTS: Product[] = [
       { size: 'G', label: 'Grande (288mm)', price: '204,90' },
     ],
     colors: [
-      { name: 'Branco', value: 'white', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/KZPabtYtHIXViNes.jpeg' },
-      { name: 'Terracota', value: 'brown', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/jiUPuHIkbgaLssUS.jpeg' },
-      { name: 'Verde', value: 'green', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/jiUPuHIkbgaLssUS.jpeg' },
+      { name: 'Branco', value: 'white', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/QQWOPeAogbPThgOu.png' },
+      { name: 'Marrom', value: 'brown', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/viiQeDaQAudvuwkl.png' },
+      { name: 'Verde', value: 'green', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663261682973/viiQeDaQAudvuwkl.png' },
     ],
   },
 ];
