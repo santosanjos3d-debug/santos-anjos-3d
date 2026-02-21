@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use CORS proxy to bypass DNS restrictions
-const USE_PROXY = true;
+// Direct connection to Melhor Envio API (proxy was failing with 522 error)
+const USE_PROXY = false;
 const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 const MELHOR_ENVIO_API = USE_PROXY 
   ? `${CORS_PROXY}https://api.melhorenvio.com.br/v2`

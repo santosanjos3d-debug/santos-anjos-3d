@@ -121,3 +121,9 @@
 - [x] Adicionar opção de retirada local aos resultados da API
 - [ ] Testar cálculo de frete no site (API + fallback)
 - [ ] Salvar checkpoint com API ativada
+
+## Debug: Endpoint para Visualizar Logs da API Melhor Envio
+- [ ] Criar endpoint de debug para mostrar logs do servidor
+- [ ] Testar endpoint e verificar erros da API
+- [ ] Diagnosticar problema de conectividade
+- [ ] Salvar checkpoint com endpoint de debug
