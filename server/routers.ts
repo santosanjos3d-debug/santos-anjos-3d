@@ -50,21 +50,71 @@ export const appRouter = router({
           G: { width: 15, height: 15, length: 30, weight: 250 },
         };
 
-        try {
-          // Use shipping table instead of API
-          const result = calculateShippingByTable(input.destinationCEP, input.sizeType);
+        const dimensions = sizeMap[input.sizeType];
 
-          return {
-            success: true,
-            services: result.services,
-          };
+        try {
+          // Try Melhor Envio API first
+          console.log('[Shipping Router] Attempting API call to Melhor Envio');
+          const apiResult = await calculateShipping({
+            destinationCEP: input.destinationCEP,
+            weight: dimensions.weight,
+            height: dimensions.height,
+            width: dimensions.width,
+            length: dimensions.length,
+          });
+
+          // If API returns services, use them
+          if (apiResult.services && apiResult.services.length > 0) {
+            console.log('[Shipping Router] API returned', apiResult.services.length, 'services');
+            
+            // Convert API format to our format
+            const services = apiResult.services.map(service => ({
+              id: service.id,
+              name: service.name,
+              price: service.price,
+              deliveryTime: service.delivery_time,
+              company: service.company.name,
+            }));
+
+            // Add local pickup option
+            services.push({
+              id: 999,
+              name: 'Retirar no Local',
+              price: 0,
+              deliveryTime: 0,
+              company: 'Retirada em Mãos',
+            });
+
+            return {
+              success: true,
+              services,
+              source: 'api',
+            };
+          }
+
+          // If API returns error, fallback to table
+          console.log('[Shipping Router] API returned no services, using fallback table');
+          throw new Error('API returned no services');
         } catch (error: any) {
-          console.error('[Shipping Router] Error:', error);
-          return {
-            success: false,
-            error: 'Erro ao calcular frete. Tente novamente.',
-            services: [],
-          };
+          // Fallback to static table
+          console.log('[Shipping Router] API failed, using static table fallback');
+          console.error('[Shipping Router] API Error:', error.message);
+          
+          try {
+            const result = calculateShippingByTable(input.destinationCEP, input.sizeType);
+            return {
+              success: true,
+              services: result.services,
+              source: 'table',
+            };
+          } catch (tableError: any) {
+            console.error('[Shipping Router] Table fallback also failed:', tableError);
+            return {
+              success: false,
+              error: 'Erro ao calcular frete. Tente novamente.',
+              services: [],
+            };
+          }
         }
       }),
   }),

@@ -112,3 +112,12 @@
 - [x] Remover fundo branco e deixar transparente
 - [x] Testar logo no site
 - [x] Salvar checkpoint com logo atualizado
+
+## Feature: Ativar API Melhor Envio com Fallback
+- [x] Modificar router para tentar API primeiro
+- [x] Implementar fallback para tabela estática em caso de erro
+- [x] Adicionar logs detalhados para debug
+- [x] Converter formato de resposta da API para formato do frontend
+- [x] Adicionar opção de retirada local aos resultados da API
+- [ ] Testar cálculo de frete no site (API + fallback)
+- [ ] Salvar checkpoint com API ativada
