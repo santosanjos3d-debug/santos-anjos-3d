@@ -1,0 +1,54 @@
+# ========================================
+# VARIÁVEIS DE AMBIENTE PARA VERCEL
+# Projeto: Santos Anjos 3D
+# ========================================
+
+# INSTRUÇÕES:
+# 1. Na tela de configuração do projeto na Vercel
+# 2. Role até "Environment Variables"
+# 3. Adicione CADA variável abaixo clicando em "Add"
+# 4. Marque: Production, Preview e Development para todas
+# 5. Depois clique em "Deploy"
+
+# ========================================
+# BANCO DE DADOS
+# ========================================
+DATABASE_URL=${DATABASE_URL}
+
+# ========================================
+# MELHOR ENVIO
+# ========================================
+MELHOR_ENVIO_TOKEN=${MELHOR_ENVIO_TOKEN}
+MELHOR_ENVIO_ORIGIN_CEP=${MELHOR_ENVIO_ORIGIN_CEP}
+MELHOR_ENVIO_CLIENT_ID=${MELHOR_ENVIO_CLIENT_ID}
+MELHOR_ENVIO_SECRET=${MELHOR_ENVIO_SECRET}
+
+# ========================================
+# AUTENTICAÇÃO (OAuth Manus)
+# ========================================
+JWT_SECRET=${JWT_SECRET}
+VITE_APP_ID=${VITE_APP_ID}
+OAUTH_SERVER_URL=${OAUTH_SERVER_URL}
+VITE_OAUTH_PORTAL_URL=${VITE_OAUTH_PORTAL_URL}
+OWNER_OPEN_ID=${OWNER_OPEN_ID}
+OWNER_NAME=${OWNER_NAME}
+
+# ========================================
+# APIs INTERNAS MANUS
+# ========================================
+BUILT_IN_FORGE_API_URL=${BUILT_IN_FORGE_API_URL}
+BUILT_IN_FORGE_API_KEY=${BUILT_IN_FORGE_API_KEY}
+VITE_FRONTEND_FORGE_API_URL=${VITE_FRONTEND_FORGE_API_URL}
+VITE_FRONTEND_FORGE_API_KEY=${VITE_FRONTEND_FORGE_API_KEY}
+
+# ========================================
+# APLICAÇÃO
+# ========================================
+VITE_APP_TITLE=Santos Anjos 3D
+VITE_APP_LOGO=/logo.svg
+
+# ========================================
+# ANALYTICS (opcional)
+# ========================================
+VITE_ANALYTICS_ENDPOINT=${VITE_ANALYTICS_ENDPOINT}
+VITE_ANALYTICS_WEBSITE_ID=${VITE_ANALYTICS_WEBSITE_ID}

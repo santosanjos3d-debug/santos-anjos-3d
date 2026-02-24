@@ -2,7 +2,7 @@ import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import ShippingCalculator from './ShippingCalculator';
+import ShippingCalculatorSimple from './ShippingCalculatorSimple';
 
 export default function Cart() {
   const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCartWithSync();
@@ -143,7 +143,7 @@ export default function Cart() {
 
                   {/* Shipping Calculator */}
                   {cep.replace(/\D/g, '').length === 8 && (
-                    <ShippingCalculator
+                    <ShippingCalculatorSimple
                       cep={cep}
                       cartItems={cart.map(item => ({ size: item.size, quantity: item.quantity }))}
                       onShippingCalculated={handleShippingCalculated}

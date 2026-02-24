@@ -127,3 +127,10 @@
 - [ ] Testar endpoint e verificar erros da API
 - [ ] Diagnosticar problema de conectividade
 - [ ] Salvar checkpoint com endpoint de debug
+
+## Bug: Deploy Vercel mostrando código-fonte
+- [ ] Criar arquivo vercel.json com configurações corretas
+- [ ] Ajustar build command e output directory
+- [ ] Fazer commit e push para GitHub
+- [ ] Verificar redeploy automático na Vercel
+- [ ] Testar API Melhor Envio no site publicado
