@@ -1,6 +1,4 @@
 // Vercel Serverless Function para cálculo de frete
-import fetch from 'node-fetch';
-
 const MELHOR_ENVIO_TOKEN = process.env.MELHOR_ENVIO_TOKEN;
 const ORIGIN_CEP = process.env.MELHOR_ENVIO_ORIGIN_CEP || '89227320';
 
@@ -39,8 +37,7 @@ export default async function handler(req, res) {
         from: { postal_code: ORIGIN_CEP },
         to: { postal_code: to_postal_code },
         packages: packages
-      }),
-      timeout: 10000
+      })
     });
 
     if (!response.ok) {
@@ -71,7 +68,7 @@ export default async function handler(req, res) {
     return res.status(200).json(services);
 
   } catch (error) {
-    console.error('[Shipping API Error]', error);
+    console.error('[Shipping API Error]', error.message);
     
     // Fallback para tabela estática
     return res.status(200).json([
