@@ -1,0 +1,9 @@
+server/
+drizzle/
+.manus/
+.manus-logs/
+.webdev/
+test-melhor-envio.mjs
+MELHOR_ENVIO_README.md
+IDEAS.md
+todo.md
