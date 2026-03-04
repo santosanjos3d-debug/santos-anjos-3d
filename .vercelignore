@@ -1,5 +1,6 @@
 server/
 drizzle/
+shared/
 .manus/
 .manus-logs/
 .webdev/
@@ -7,3 +8,8 @@ test-melhor-envio.mjs
 MELHOR_ENVIO_README.md
 IDEAS.md
 todo.md
+*.test.ts
+*.test.tsx
+vitest.config.ts
+.env*
+coverage/
