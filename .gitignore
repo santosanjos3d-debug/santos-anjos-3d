@@ -3,7 +3,7 @@
 .pnpm-store/
 
 # Build outputs
-dist/
+# dist/  # Keep client/dist for Vercel
 build/
 *.dist
 
