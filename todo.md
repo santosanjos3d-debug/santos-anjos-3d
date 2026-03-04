@@ -134,3 +134,12 @@
 - [ ] Fazer commit e push para GitHub
 - [ ] Verificar redeploy automático na Vercel
 - [ ] Testar API Melhor Envio no site publicado
+
+
+## MIGRAÇÃO VERCEL - NOVA ARQUITETURA SERVERLESS
+- [x] Remover tRPC e dependências complexas (build:frontend criado)
+- [x] Criar API simples em `/api/shipping.ts` (Vercel Functions) - já existe
+- [x] Converter frontend para HTML/CSS/JS puro ou React simples (React + Vite)
+- [x] Testar localmente com Vercel CLI (build funcionando)
+- [ ] Configurar variáveis de ambiente na Vercel
+- [ ] Deploy e validar funcionamento em produção

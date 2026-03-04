@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd client && pnpm install && pnpm build",
+  "buildCommand": "pnpm install && pnpm run build:frontend",
   "outputDirectory": "client/dist",
   "framework": "vite",
   "functions": {
