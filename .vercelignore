@@ -1,6 +1,5 @@
 server/
 drizzle/
-shared/
 .manus/
 .manus-logs/
 .webdev/
