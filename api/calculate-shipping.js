@@ -23,9 +23,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  // Verificar se o token está configurado
+  if (!MELHOR_ENVIO_TOKEN) {
+    console.error('[Shipping API] MELHOR_ENVIO_TOKEN não configurado!');
+    return res.status(500).json({ 
+      error: 'Token do Melhor Envio não configurado',
+      debug: 'MELHOR_ENVIO_TOKEN is missing'
+    });
+  }
+
   try {
     // Chamar API Melhor Envio
-    const response = await fetch('https://api.melhorenvio.com.br/api/v2/me/shipment/calculate', {
+    const meResponse = await fetch('https://api.melhorenvio.com.br/api/v2/me/shipment/calculate', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -40,21 +49,34 @@ export default async function handler(req, res) {
       })
     });
 
-    if (!response.ok) {
-      throw new Error(`API returned ${response.status}`);
+    const responseText = await meResponse.text();
+    
+    if (!meResponse.ok) {
+      console.error('[Shipping API] Melhor Envio error:', meResponse.status, responseText);
+      return res.status(200).json({
+        error: true,
+        debug: {
+          status: meResponse.status,
+          message: responseText,
+          token_prefix: MELHOR_ENVIO_TOKEN ? MELHOR_ENVIO_TOKEN.substring(0, 20) + '...' : 'NOT SET'
+        },
+        fallback: getFallback()
+      });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     
-    // Adicionar opção de retirada local
-    const services = data.map(service => ({
-      id: service.id,
-      name: service.name,
-      company: service.company.name,
-      price: service.price,
-      delivery_time: service.delivery_time,
-      currency: 'R$'
-    }));
+    // Filtrar apenas serviços com preço válido
+    const services = data
+      .filter(service => service.price && !service.error)
+      .map(service => ({
+        id: service.id,
+        name: service.name,
+        company: service.company.name,
+        price: service.price,
+        delivery_time: service.delivery_time,
+        currency: 'R$'
+      }));
 
     services.push({
       id: 'retirada-local',
@@ -69,33 +91,18 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('[Shipping API Error]', error.message);
-    
-    // Fallback para tabela estática
-    return res.status(200).json([
-      {
-        id: 'pac',
-        name: 'PAC',
-        company: 'Correios',
-        price: '15.00',
-        delivery_time: 10,
-        currency: 'R$'
-      },
-      {
-        id: 'sedex',
-        name: 'SEDEX',
-        company: 'Correios',
-        price: '25.00',
-        delivery_time: 5,
-        currency: 'R$'
-      },
-      {
-        id: 'retirada-local',
-        name: 'Retirada no Local',
-        company: 'Santos Anjos 3D',
-        price: '0.00',
-        delivery_time: 0,
-        currency: 'R$'
-      }
-    ]);
+    return res.status(200).json({
+      error: true,
+      debug: { message: error.message },
+      fallback: getFallback()
+    });
   }
+}
+
+function getFallback() {
+  return [
+    { id: 'pac', name: 'PAC', company: 'Correios', price: '15.00', delivery_time: 10, currency: 'R$' },
+    { id: 'sedex', name: 'SEDEX', company: 'Correios', price: '25.00', delivery_time: 5, currency: 'R$' },
+    { id: 'retirada-local', name: 'Retirada no Local', company: 'Santos Anjos 3D', price: '0.00', delivery_time: 0, currency: 'R$' }
+  ];
 }
