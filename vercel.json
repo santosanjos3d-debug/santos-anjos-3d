@@ -1,20 +1,10 @@
 {
-  "buildCommand": "pnpm install && pnpm run build:frontend",
-  "outputDirectory": "client/dist",
+  "buildCommand": "pnpm install && pnpm run build:frontend && cp -r client/dist/* public/",
+  "outputDirectory": "public",
   "framework": "vite",
   "functions": {
     "api/**/*.js": {
       "runtime": "nodejs20.x"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  }
 }
