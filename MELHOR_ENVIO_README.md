@@ -11,7 +11,7 @@
 ### Fluxo do Cliente
 
 1. Cliente adiciona produtos ao carrinho
-2. Informa o CEP de entrega (cep: 00000-000)
+2. Informa o CEP de entrega (cep:00000-000)
 3. Sistema calcula automaticamente as opções de frete disponíveis via API Melhor Envio
 4. Cliente seleciona a opção de frete desejada (PAC, SEDEX, etc.)
 5. Total (produtos + frete) é exibido no carrinho
