@@ -160,3 +160,8 @@
 - [x] Corrigir vite.config.ts: outDir de client/dist para dist/public
 - [x] Testar build completo (dist/index.js + dist/public/index.html)
 - [ ] Salvar checkpoint e publicar
+
+## Feature: Filtrar opções de frete (SEDEX, Jadlog .Package, Jadlog .Com, Retirada)
+- [x] Verificar nomes exatos retornados pela API do Melhor Envio
+- [x] Filtrar API para retornar apenas as 5 opções desejadas (SEDEX id=2, Jadlog .Package id=3, Jadlog .Com id=4, JeT Standard id=33, Retirada)
+- [x] Testar e salvar checkpoint

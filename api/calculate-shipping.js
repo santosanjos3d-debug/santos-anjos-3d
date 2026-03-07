@@ -67,9 +67,12 @@ export default async function handler(req, res) {
           throw new Error('Resposta inválida');
         }
 
-        // Filtrar apenas serviços com preço válido (sem erro)
+        // IDs das transportadoras permitidas
+        const ALLOWED_IDS = [2, 3, 4, 33]; // SEDEX, Jadlog .Package, Jadlog .Com, JeT Standard
+
+        // Filtrar apenas os serviços desejados com preço válido
         const services = data
-          .filter(service => service.price && !service.error)
+          .filter(service => ALLOWED_IDS.includes(service.id) && service.price && !service.error)
           .map(service => ({
             id: service.id,
             name: service.name,
