@@ -1272,6 +1272,85 @@ function serveStatic(app) {
 }
 
 // server/_core/index.ts
+var MELHOR_ENVIO_URL = "https://melhorenvio.com.br/api/v2/me/shipment/calculate";
+async function calculateShippingHandler(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+  const { to_postal_code, packages } = req.body;
+  if (!to_postal_code || !packages) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  const MELHOR_ENVIO_TOKEN2 = process.env.MELHOR_ENVIO_TOKEN;
+  const ORIGIN_CEP2 = process.env.MELHOR_ENVIO_ORIGIN_CEP || "89227320";
+  const volumes = packages.map((pkg) => ({
+    height: pkg.height || 15,
+    width: pkg.width || 15,
+    length: pkg.length || 30,
+    weight: pkg.weight || 0.5
+  }));
+  if (MELHOR_ENVIO_TOKEN2) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15e3);
+      const meResponse = await fetch(MELHOR_ENVIO_URL, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${MELHOR_ENVIO_TOKEN2}`,
+          "User-Agent": "Santos Anjos 3D (contato@santosanjos3d.com.br)"
+        },
+        body: JSON.stringify({
+          from: { postal_code: ORIGIN_CEP2 },
+          to: { postal_code: to_postal_code },
+          volumes
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (meResponse.ok) {
+        const data = await meResponse.json();
+        if (Array.isArray(data)) {
+          const services = data.filter((s) => s.price && !s.error).map((s) => ({
+            id: s.id,
+            name: s.name,
+            company: s.company?.name || s.company,
+            price: s.price,
+            delivery_time: s.delivery_time,
+            currency: "R$"
+          }));
+          services.push({
+            id: "retirada-local",
+            name: "Retirada no Local",
+            company: "Santos Anjos 3D",
+            price: "0.00",
+            delivery_time: 0,
+            currency: "R$"
+          });
+          if (services.length > 1) {
+            return res.status(200).json(services);
+          }
+        }
+      }
+      console.error("[Shipping] Melhor Envio retornou status:", meResponse.status);
+    } catch (error) {
+      console.error("[Shipping] Erro ao chamar Melhor Envio:", error.message);
+    }
+  }
+  return res.status(200).json([
+    { id: "pac", name: "PAC (estimativa)", company: "Correios", price: "15.00", delivery_time: 10, currency: "R$" },
+    { id: "sedex", name: "SEDEX (estimativa)", company: "Correios", price: "25.00", delivery_time: 5, currency: "R$" },
+    { id: "retirada-local", name: "Retirada no Local", company: "Santos Anjos 3D", price: "0.00", delivery_time: 0, currency: "R$" }
+  ]);
+}
 function isPortAvailable(port) {
   return new Promise((resolve) => {
     const server = net.createServer();
@@ -1295,6 +1374,7 @@ async function startServer() {
   app.use(express2.json({ limit: "50mb" }));
   app.use(express2.urlencoded({ limit: "50mb", extended: true }));
   registerOAuthRoutes(app);
+  app.all("/api/calculate-shipping", calculateShippingHandler);
   app.use(
     "/api/trpc",
     createExpressMiddleware({

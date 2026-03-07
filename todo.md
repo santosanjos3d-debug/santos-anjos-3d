@@ -148,3 +148,10 @@
 - [x] Registrar rota /api/calculate-shipping no servidor Express local
 - [x] Testar cálculo de frete no ambiente local
 - [x] Salvar checkpoint com correção
+
+## Bug Fix: Deploy falhou - MODULE_NOT_FOUND dist/index.js
+- [x] Corrigir erro de build do servidor (dist/index.js não encontrado)
+- [x] Garantir que o build do servidor gera dist/index.js corretamente
+- [x] Corrigir API do Melhor Envio em produção (URL e payload corretos)
+- [x] Testar build completo (frontend + servidor)
+- [ ] Publicar novamente e validar frete em produção
