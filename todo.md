@@ -155,3 +155,8 @@
 - [x] Corrigir API do Melhor Envio em produção (URL e payload corretos)
 - [x] Testar build completo (frontend + servidor)
 - [ ] Publicar novamente e validar frete em produção
+
+## Bug Fix: Deploy ServiceDeployNotTemplate - outDir incorreto
+- [x] Corrigir vite.config.ts: outDir de client/dist para dist/public
+- [x] Testar build completo (dist/index.js + dist/public/index.html)
+- [ ] Salvar checkpoint e publicar
