@@ -143,3 +143,8 @@
 - [x] Testar localmente com Vercel CLI (build funcionando)
 - [ ] Configurar variáveis de ambiente na Vercel
 - [ ] Deploy e validar funcionamento em produção
+
+## Bug Fix: API de frete retornando HTML no ambiente local
+- [x] Registrar rota /api/calculate-shipping no servidor Express local
+- [x] Testar cálculo de frete no ambiente local
+- [x] Salvar checkpoint com correção
