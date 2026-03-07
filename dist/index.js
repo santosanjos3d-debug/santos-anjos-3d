@@ -1319,7 +1319,7 @@ async function calculateShippingHandler(req, res) {
       if (meResponse.ok) {
         const data = await meResponse.json();
         if (Array.isArray(data)) {
-          const ALLOWED_IDS = [2, 3, 4, 33];
+          const ALLOWED_IDS = [2, 3, 33];
           const services = data.filter((s) => ALLOWED_IDS.includes(s.id) && s.price && !s.error).map((s) => ({
             id: s.id,
             name: s.name,

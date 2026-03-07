@@ -68,7 +68,7 @@ export default async function handler(req, res) {
         }
 
         // IDs das transportadoras permitidas
-        const ALLOWED_IDS = [2, 3, 4, 33]; // SEDEX, Jadlog .Package, Jadlog .Com, JeT Standard
+        const ALLOWED_IDS = [2, 3, 33]; // SEDEX, Jadlog .Package, JeT Standard
 
         // Filtrar apenas os serviços desejados com preço válido
         const services = data

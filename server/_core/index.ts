@@ -71,8 +71,8 @@ async function calculateShippingHandler(req: express.Request, res: express.Respo
         const data = await meResponse.json() as any[];
 
         if (Array.isArray(data)) {
-          // IDs das transportadoras permitidas: SEDEX, Jadlog .Package, Jadlog .Com, JeT Standard
-          const ALLOWED_IDS = [2, 3, 4, 33];
+          // IDs das transportadoras permitidas: SEDEX, Jadlog .Package, JeT Standard
+          const ALLOWED_IDS = [2, 3, 33];
 
           const services = data
             .filter((s: any) => ALLOWED_IDS.includes(s.id) && s.price && !s.error)
