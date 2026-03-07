@@ -8,7 +8,7 @@
 
 ## 📋 Como Funciona
 
-### Fluxo do Cliente
+### Fluxo dos Clientes
 
 1. Cliente adiciona produtos ao carrinho
 2. Informa o CEP de entrega (cep:00000-000)
