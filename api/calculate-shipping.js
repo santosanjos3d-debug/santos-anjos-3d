@@ -2,6 +2,9 @@
 const MELHOR_ENVIO_TOKEN = process.env.MELHOR_ENVIO_TOKEN;
 const ORIGIN_CEP = process.env.MELHOR_ENVIO_ORIGIN_CEP || '89227320';
 
+// URL correta da API do Melhor Envio (sem prefixo api.)
+const MELHOR_ENVIO_URL = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate';
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -23,13 +26,21 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  // Converter packages para volumes (formato correto da API do Melhor Envio)
+  const volumes = packages.map(pkg => ({
+    height: pkg.height || 15,
+    width: pkg.width || 15,
+    length: pkg.length || 30,
+    weight: pkg.weight || 0.5
+  }));
+
   // Tentar Melhor Envio se token disponível
   if (MELHOR_ENVIO_TOKEN) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-      const meResponse = await fetch('https://api.melhorenvio.com.br/api/v2/me/shipment/calculate', {
+      const meResponse = await fetch(MELHOR_ENVIO_URL, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -40,7 +51,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: { postal_code: ORIGIN_CEP },
           to: { postal_code: to_postal_code },
-          packages: packages
+          volumes: volumes
         }),
         signal: controller.signal
       });
@@ -50,6 +61,12 @@ export default async function handler(req, res) {
       if (meResponse.ok) {
         const data = await meResponse.json();
         
+        // Verificar se retornou um array válido
+        if (!Array.isArray(data)) {
+          console.error('[Shipping API] Resposta inválida do Melhor Envio:', data);
+          throw new Error('Resposta inválida');
+        }
+
         // Filtrar apenas serviços com preço válido (sem erro)
         const services = data
           .filter(service => service.price && !service.error)
@@ -75,9 +92,12 @@ export default async function handler(req, res) {
         if (services.length > 1) {
           return res.status(200).json(services);
         }
+        
+        console.error('[Shipping API] Nenhum serviço disponível do Melhor Envio');
+      } else {
+        const errorText = await meResponse.text();
+        console.error('[Shipping API] Melhor Envio retornou status:', meResponse.status, errorText.substring(0, 200));
       }
-      
-      console.error('[Shipping API] Melhor Envio retornou status:', meResponse.status);
     } catch (error) {
       console.error('[Shipping API] Erro ao chamar Melhor Envio:', error.message);
     }
