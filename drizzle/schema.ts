@@ -2,16 +2,9 @@ import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "d
 
 /**
  * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
  */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -44,22 +37,49 @@ export type InsertProduct = typeof products.$inferInsert;
 
 /**
  * Pedidos realizados pelos clientes
+ * Inclui endereço completo para geração de etiqueta via Melhor Envio
  */
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   orderNumber: varchar("orderNumber", { length: 32 }).notNull().unique(),
+
+  // Dados do cliente
   customerName: varchar("customerName", { length: 255 }).notNull(),
   customerEmail: varchar("customerEmail", { length: 320 }),
   customerPhone: varchar("customerPhone", { length: 20 }),
-  customerCep: varchar("customerCep", { length: 9 }),
-  productId: int("productId").notNull(),
-  quantity: int("quantity").notNull().default(1),
+  customerDocument: varchar("customerDocument", { length: 20 }), // CPF/CNPJ
+
+  // Endereço completo para etiqueta
+  addressPostalCode: varchar("addressPostalCode", { length: 9 }),
+  addressStreet: varchar("addressStreet", { length: 255 }),
+  addressNumber: varchar("addressNumber", { length: 20 }),
+  addressComplement: varchar("addressComplement", { length: 100 }),
+  addressDistrict: varchar("addressDistrict", { length: 100 }),
+  addressCity: varchar("addressCity", { length: 100 }),
+  addressState: varchar("addressState", { length: 2 }),
+
+  // Frete escolhido
+  shippingServiceId: int("shippingServiceId"),       // ID do serviço no Melhor Envio (ex: 2=SEDEX, 3=Jadlog)
+  shippingServiceName: varchar("shippingServiceName", { length: 100 }), // Nome exibido
+  shippingCompany: varchar("shippingCompany", { length: 100 }),
+
+  // Valores
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   shippingCost: decimal("shippingCost", { precision: 10, scale: 2 }).default("0"),
   totalPrice: decimal("totalPrice", { precision: 10, scale: 2 }).notNull(),
-  pixKey: varchar("pixKey", { length: 255 }).notNull(),
-  status: mysqlEnum("status", ["pending", "paid", "processing", "completed", "cancelled"]).default("pending").notNull(),
-  paymentId: varchar("paymentId", { length: 255 }),
+
+  // Resumo dos itens (JSON serializado)
+  itemsSummary: text("itemsSummary"), // JSON: [{name, size, color, qty, price}]
+
+  // Status do pedido
+  status: mysqlEnum("status", ["pending", "paid", "processing", "shipped", "completed", "cancelled"]).default("pending").notNull(),
+
+  // Integração Melhor Envio
+  melhorEnvioOrderId: varchar("melhorEnvioOrderId", { length: 100 }), // ID do envio no ME
+  melhorEnvioProtocol: varchar("melhorEnvioProtocol", { length: 100 }), // Protocolo após compra
+  trackingCode: varchar("trackingCode", { length: 50 }),  // Código de rastreio
+  labelUrl: text("labelUrl"),  // URL da etiqueta PDF gerada
+
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -69,7 +89,7 @@ export type Order = typeof orders.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;
 
 /**
- * Tabela de fretes por região
+ * Tabela de fretes por região (fallback)
  */
 export const shippingRates = mysqlTable("shippingRates", {
   id: int("id").autoincrement().primaryKey(),

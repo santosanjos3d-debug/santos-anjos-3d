@@ -13,18 +13,13 @@ var UNAUTHED_ERR_MSG = "Please login (10001)";
 var NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
 
 // server/db.ts
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 
 // drizzle/schema.ts
 import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 var users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -47,18 +42,44 @@ var products = mysqlTable("products", {
 var orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   orderNumber: varchar("orderNumber", { length: 32 }).notNull().unique(),
+  // Dados do cliente
   customerName: varchar("customerName", { length: 255 }).notNull(),
   customerEmail: varchar("customerEmail", { length: 320 }),
   customerPhone: varchar("customerPhone", { length: 20 }),
-  customerCep: varchar("customerCep", { length: 9 }),
-  productId: int("productId").notNull(),
-  quantity: int("quantity").notNull().default(1),
+  customerDocument: varchar("customerDocument", { length: 20 }),
+  // CPF/CNPJ
+  // Endereço completo para etiqueta
+  addressPostalCode: varchar("addressPostalCode", { length: 9 }),
+  addressStreet: varchar("addressStreet", { length: 255 }),
+  addressNumber: varchar("addressNumber", { length: 20 }),
+  addressComplement: varchar("addressComplement", { length: 100 }),
+  addressDistrict: varchar("addressDistrict", { length: 100 }),
+  addressCity: varchar("addressCity", { length: 100 }),
+  addressState: varchar("addressState", { length: 2 }),
+  // Frete escolhido
+  shippingServiceId: int("shippingServiceId"),
+  // ID do serviço no Melhor Envio (ex: 2=SEDEX, 3=Jadlog)
+  shippingServiceName: varchar("shippingServiceName", { length: 100 }),
+  // Nome exibido
+  shippingCompany: varchar("shippingCompany", { length: 100 }),
+  // Valores
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   shippingCost: decimal("shippingCost", { precision: 10, scale: 2 }).default("0"),
   totalPrice: decimal("totalPrice", { precision: 10, scale: 2 }).notNull(),
-  pixKey: varchar("pixKey", { length: 255 }).notNull(),
-  status: mysqlEnum("status", ["pending", "paid", "processing", "completed", "cancelled"]).default("pending").notNull(),
-  paymentId: varchar("paymentId", { length: 255 }),
+  // Resumo dos itens (JSON serializado)
+  itemsSummary: text("itemsSummary"),
+  // JSON: [{name, size, color, qty, price}]
+  // Status do pedido
+  status: mysqlEnum("status", ["pending", "paid", "processing", "shipped", "completed", "cancelled"]).default("pending").notNull(),
+  // Integração Melhor Envio
+  melhorEnvioOrderId: varchar("melhorEnvioOrderId", { length: 100 }),
+  // ID do envio no ME
+  melhorEnvioProtocol: varchar("melhorEnvioProtocol", { length: 100 }),
+  // Protocolo após compra
+  trackingCode: varchar("trackingCode", { length: 50 }),
+  // Código de rastreio
+  labelUrl: text("labelUrl"),
+  // URL da etiqueta PDF gerada
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
@@ -100,18 +121,14 @@ async function getDb() {
   return _db;
 }
 async function upsertUser(user) {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
+  if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot upsert user: database not available");
     return;
   }
   try {
-    const values = {
-      openId: user.openId
-    };
+    const values = { openId: user.openId };
     const updateSet = {};
     const textFields = ["name", "email", "loginMethod"];
     const assignNullable = (field) => {
@@ -133,15 +150,9 @@ async function upsertUser(user) {
       values.role = "admin";
       updateSet.role = "admin";
     }
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = /* @__PURE__ */ new Date();
-    }
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = /* @__PURE__ */ new Date();
-    }
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet
-    });
+    if (!values.lastSignedIn) values.lastSignedIn = /* @__PURE__ */ new Date();
+    if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = /* @__PURE__ */ new Date();
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
@@ -179,15 +190,32 @@ async function getOrderByNumber(orderNumber) {
   const result = await db.select().from(orders).where(eq(orders.orderNumber, orderNumber)).limit(1);
   return result.length > 0 ? result[0] : void 0;
 }
+async function getOrderById(id) {
+  const db = await getDb();
+  if (!db) return void 0;
+  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return result.length > 0 ? result[0] : void 0;
+}
 async function getAllOrders() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(orders);
+  return await db.select().from(orders).orderBy(desc(orders.createdAt));
 }
 async function updateOrderStatus(id, status) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return await db.update(orders).set({ status }).where(eq(orders.id, id));
+}
+async function updateOrderLabelInfo(id, data) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const updateSet = {};
+  if (data.melhorEnvioOrderId !== void 0) updateSet.melhorEnvioOrderId = data.melhorEnvioOrderId;
+  if (data.melhorEnvioProtocol !== void 0) updateSet.melhorEnvioProtocol = data.melhorEnvioProtocol;
+  if (data.trackingCode !== void 0) updateSet.trackingCode = data.trackingCode;
+  if (data.labelUrl !== void 0) updateSet.labelUrl = data.labelUrl;
+  if (data.status !== void 0) updateSet.status = data.status;
+  return await db.update(orders).set(updateSet).where(eq(orders.id, id));
 }
 async function initializeShippingRates() {
   const db = await getDb();
@@ -230,36 +258,11 @@ async function initializeProducts() {
   const existingProducts = await db.select().from(products);
   if (existingProducts.length > 0) return;
   const productsToInsert = [
-    {
-      name: "Nossa Senhora de Lourdes",
-      description: "Estatueta de Nossa Senhora de Lourdes em resina branca com acabamento fino. Perfeita para devo\xE7\xE3o e decora\xE7\xE3o.",
-      price: "150.00",
-      image: "/images/nossa-senhora-lourdes.jpg"
-    },
-    {
-      name: "Sagrado Cora\xE7\xE3o de Maria",
-      description: "Representa\xE7\xE3o do Sagrado Cora\xE7\xE3o de Maria com detalhes delicados. S\xEDmbolo de amor e prote\xE7\xE3o maternal.",
-      price: "150.00",
-      image: "/images/sagrado-coracao-maria.jpg"
-    },
-    {
-      name: "Santa Hildegarda de Bingen",
-      description: "Santa Hildegarda, m\xEDstica e estudiosa, com livro em m\xE3os. Padroeira dos intelectuais e cientistas.",
-      price: "140.00",
-      image: "/images/santa-hildegarda.jpg"
-    },
-    {
-      name: "S\xE3o Francisco de Assis",
-      description: "S\xE3o Francisco em sua veste caracter\xEDstica. Padroeiro da natureza e dos animais, s\xEDmbolo de paz e simplicidade.",
-      price: "140.00",
-      image: "/images/sao-francisco.jpg"
-    },
-    {
-      name: "S\xE3o Jos\xE9 com Menino Jesus",
-      description: "S\xE3o Jos\xE9 protetor com o Menino Jesus nos bra\xE7os. Representa a paternidade, prote\xE7\xE3o e amor familiar.",
-      price: "160.00",
-      image: "/images/sao-jose.jpg"
-    }
+    { name: "Nossa Senhora de Lourdes", description: "Estatueta de Nossa Senhora de Lourdes em resina branca com acabamento fino.", price: "150.00", image: "/images/nossa-senhora-lourdes.jpg" },
+    { name: "Sagrado Cora\xE7\xE3o de Maria", description: "Representa\xE7\xE3o do Sagrado Cora\xE7\xE3o de Maria com detalhes delicados.", price: "150.00", image: "/images/sagrado-coracao-maria.jpg" },
+    { name: "Santa Hildegarda de Bingen", description: "Santa Hildegarda, m\xEDstica e estudiosa, com livro em m\xE3os.", price: "140.00", image: "/images/santa-hildegarda.jpg" },
+    { name: "S\xE3o Francisco de Assis", description: "S\xE3o Francisco em sua veste caracter\xEDstica. Padroeiro da natureza e dos animais.", price: "140.00", image: "/images/sao-francisco.jpg" },
+    { name: "S\xE3o Jos\xE9 com Menino Jesus", description: "S\xE3o Jos\xE9 protetor com o Menino Jesus nos bra\xE7os.", price: "160.00", image: "/images/sao-jose.jpg" }
   ];
   try {
     await db.insert(products).values(productsToInsert);
@@ -1032,7 +1035,181 @@ function calculateShippingByTable(cep, size, includeLocalPickup = true) {
   };
 }
 
+// server/melhorenvio-labels.ts
+var ME_BASE_URL = "https://melhorenvio.com.br/api/v2";
+var ORIGIN_CEP2 = process.env.MELHOR_ENVIO_ORIGIN_CEP || "89227320";
+var SENDER = {
+  name: "Santos Anjos 3D",
+  phone: "47996641959",
+  email: "contato@santosanjos3d.com.br",
+  document: process.env.MELHOR_ENVIO_DOCUMENT || "",
+  // CPF ou CNPJ da loja
+  address: {
+    postal_code: ORIGIN_CEP2
+    // Estes campos são preenchidos automaticamente pelo Melhor Envio via CEP
+  }
+};
+function getHeaders() {
+  const token = process.env.MELHOR_ENVIO_TOKEN;
+  if (!token) throw new Error("MELHOR_ENVIO_TOKEN n\xE3o configurado");
+  return {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
+    "User-Agent": "Santos Anjos 3D (contato@santosanjos3d.com.br)"
+  };
+}
+function estimatePackageDimensions(itemsSummary) {
+  return {
+    height: 15,
+    width: 15,
+    length: 25,
+    weight: 0.5
+    // kg
+  };
+}
+async function addToMelhorEnvioCart(order) {
+  const dimensions = estimatePackageDimensions(order.itemsSummary);
+  const payload = {
+    service: order.shippingServiceId,
+    agency: null,
+    from: {
+      name: SENDER.name,
+      phone: SENDER.phone,
+      email: SENDER.email,
+      document: SENDER.document || void 0,
+      address: ORIGIN_CEP2,
+      postal_code: ORIGIN_CEP2
+    },
+    to: {
+      name: order.customerName,
+      phone: order.customerPhone?.replace(/\D/g, "") || "",
+      email: null,
+      document: order.customerDocument?.replace(/\D/g, "") || void 0,
+      address: order.addressStreet,
+      number: order.addressNumber,
+      complement: order.addressComplement || void 0,
+      district: order.addressDistrict,
+      city: order.addressCity,
+      state_abbr: order.addressState,
+      postal_code: order.addressPostalCode?.replace(/\D/g, ""),
+      country_id: "BR"
+    },
+    products: [
+      {
+        name: "Arte Sacra 3D",
+        quantity: 1,
+        unitary_value: parseFloat(order.totalPrice)
+      }
+    ],
+    volumes: [
+      {
+        height: dimensions.height,
+        width: dimensions.width,
+        length: dimensions.length,
+        weight: dimensions.weight
+      }
+    ],
+    options: {
+      insurance_value: parseFloat(order.totalPrice),
+      receipt: false,
+      own_hand: false,
+      reverse: false,
+      non_commercial: false,
+      invoice: {
+        key: null
+      },
+      tags: [
+        {
+          tag: order.orderNumber,
+          url: null
+        }
+      ]
+    }
+  };
+  const response = await fetch(`${ME_BASE_URL}/me/cart`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Erro ao adicionar ao carrinho ME: ${response.status} \u2014 ${errorText.substring(0, 300)}`);
+  }
+  const data = await response.json();
+  console.log("[MelhorEnvio] Adicionado ao carrinho:", data.id);
+  return data.id;
+}
+async function purchaseMelhorEnvioShipment(cartItemIds) {
+  const response = await fetch(`${ME_BASE_URL}/me/shipment/checkout`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ orders: cartItemIds })
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Erro ao comprar frete ME: ${response.status} \u2014 ${errorText.substring(0, 300)}`);
+  }
+  const data = await response.json();
+  console.log("[MelhorEnvio] Frete comprado:", data);
+  return cartItemIds[0];
+}
+async function generateMelhorEnvioLabel(orderId) {
+  const response = await fetch(`${ME_BASE_URL}/me/shipment/generate`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ orders: [orderId] })
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Erro ao gerar etiqueta ME: ${response.status} \u2014 ${errorText.substring(0, 300)}`);
+  }
+  console.log("[MelhorEnvio] Etiqueta gerada para:", orderId);
+}
+async function printMelhorEnvioLabel(orderId) {
+  const response = await fetch(`${ME_BASE_URL}/me/shipment/print`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({
+      mode: "private",
+      orders: [orderId]
+    })
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Erro ao imprimir etiqueta ME: ${response.status} \u2014 ${errorText.substring(0, 300)}`);
+  }
+  const data = await response.json();
+  console.log("[MelhorEnvio] URL da etiqueta:", data.url);
+  return data.url;
+}
+async function generateLabelForOrder(order) {
+  const cartItemId = await addToMelhorEnvioCart(order);
+  await purchaseMelhorEnvioShipment([cartItemId]);
+  await generateMelhorEnvioLabel(cartItemId);
+  const labelUrl = await printMelhorEnvioLabel(cartItemId);
+  return {
+    melhorEnvioOrderId: cartItemId,
+    labelUrl
+  };
+}
+async function trackMelhorEnvioShipment(orderId) {
+  const response = await fetch(`${ME_BASE_URL}/me/orders/${orderId}`, {
+    method: "GET",
+    headers: getHeaders()
+  });
+  if (!response.ok) {
+    throw new Error(`Erro ao buscar rastreio: ${response.status}`);
+  }
+  const data = await response.json();
+  return {
+    trackingCode: data.tracking || null,
+    status: data.status || "unknown"
+  };
+}
+
 // server/routers.ts
+import { TRPCError as TRPCError3 } from "@trpc/server";
 var appRouter = router({
   system: systemRouter,
   auth: router({
@@ -1040,9 +1217,7 @@ var appRouter = router({
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true
-      };
+      return { success: true };
     })
   }),
   products: router({
@@ -1055,12 +1230,10 @@ var appRouter = router({
       await initializeShippingRates();
       return { success: true };
     }),
-    calculateMelhorEnvio: publicProcedure.input(
-      z2.object({
-        destinationCEP: z2.string().regex(/^\d{8}$/, "CEP deve ter 8 d\xEDgitos"),
-        sizeType: z2.enum(["P", "M", "G"])
-      })
-    ).query(async ({ input }) => {
+    calculateMelhorEnvio: publicProcedure.input(z2.object({
+      destinationCEP: z2.string().regex(/^\d{8}$/, "CEP deve ter 8 d\xEDgitos"),
+      sizeType: z2.enum(["P", "M", "G"])
+    })).query(async ({ input }) => {
       const sizeMap = {
         P: { width: 8, height: 8, length: 15, weight: 100 },
         M: { width: 10, height: 10, length: 23, weight: 150 },
@@ -1068,7 +1241,6 @@ var appRouter = router({
       };
       const dimensions = sizeMap[input.sizeType];
       try {
-        console.log("[Shipping Router] Attempting API call to Melhor Envio");
         const apiResult = await calculateShipping({
           destinationCEP: input.destinationCEP,
           weight: dimensions.weight,
@@ -1077,7 +1249,6 @@ var appRouter = router({
           length: dimensions.length
         });
         if (apiResult.services && apiResult.services.length > 0) {
-          console.log("[Shipping Router] API returned", apiResult.services.length, "services");
           const services = apiResult.services.map((service) => ({
             id: service.id,
             name: service.name,
@@ -1085,68 +1256,92 @@ var appRouter = router({
             deliveryTime: service.delivery_time,
             company: service.company.name
           }));
-          services.push({
-            id: 999,
-            name: "Retirar no Local",
-            price: 0,
-            deliveryTime: 0,
-            company: "Retirada em M\xE3os"
-          });
-          return {
-            success: true,
-            services,
-            source: "api"
-          };
+          services.push({ id: 999, name: "Retirar no Local", price: 0, deliveryTime: 0, company: "Retirada em M\xE3os" });
+          return { success: true, services, source: "api" };
         }
-        console.log("[Shipping Router] API returned no services, using fallback table");
         throw new Error("API returned no services");
       } catch (error) {
-        console.log("[Shipping Router] API failed, using static table fallback");
-        console.error("[Shipping Router] API Error:", error.message);
         try {
           const result = calculateShippingByTable(input.destinationCEP, input.sizeType);
-          return {
-            success: true,
-            services: result.services,
-            source: "table"
-          };
+          return { success: true, services: result.services, source: "table" };
         } catch (tableError) {
-          console.error("[Shipping Router] Table fallback also failed:", tableError);
-          return {
-            success: false,
-            error: "Erro ao calcular frete. Tente novamente.",
-            services: []
-          };
+          return { success: false, error: "Erro ao calcular frete. Tente novamente.", services: [] };
         }
       }
     })
   }),
   orders: router({
+    /**
+     * Criar pedido completo com endereço (novo fluxo com etiqueta)
+     */
+    createFull: publicProcedure.input(z2.object({
+      customerName: z2.string().min(1),
+      customerPhone: z2.string().min(1),
+      customerDocument: z2.string().optional(),
+      addressPostalCode: z2.string().min(8),
+      addressStreet: z2.string().min(1),
+      addressNumber: z2.string().min(1),
+      addressComplement: z2.string().optional(),
+      addressDistrict: z2.string().min(1),
+      addressCity: z2.string().min(1),
+      addressState: z2.string().length(2),
+      shippingServiceId: z2.number().optional(),
+      shippingServiceName: z2.string().optional(),
+      shippingCompany: z2.string().optional(),
+      subtotal: z2.string(),
+      shippingCost: z2.string(),
+      totalPrice: z2.string(),
+      itemsSummary: z2.string().optional()
+    })).mutation(async ({ input }) => {
+      const orderNumber = `SA-${nanoid(8).toUpperCase()}`;
+      await createOrder({
+        orderNumber,
+        customerName: input.customerName,
+        customerPhone: input.customerPhone,
+        customerDocument: input.customerDocument || null,
+        addressPostalCode: input.addressPostalCode,
+        addressStreet: input.addressStreet,
+        addressNumber: input.addressNumber,
+        addressComplement: input.addressComplement || null,
+        addressDistrict: input.addressDistrict,
+        addressCity: input.addressCity,
+        addressState: input.addressState,
+        shippingServiceId: input.shippingServiceId || null,
+        shippingServiceName: input.shippingServiceName || null,
+        shippingCompany: input.shippingCompany || null,
+        subtotal: input.subtotal,
+        shippingCost: input.shippingCost,
+        totalPrice: input.totalPrice,
+        itemsSummary: input.itemsSummary || null,
+        status: "pending"
+      });
+      const order = await getOrderByNumber(orderNumber);
+      if (!order) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Erro ao criar pedido" });
+      return order;
+    }),
+    /**
+     * Criar pedido simples (legado)
+     */
     create: publicProcedure.input(z2.object({
       customerName: z2.string().min(1),
       customerEmail: z2.string().email().optional(),
       customerPhone: z2.string().optional(),
-      customerCep: z2.string().optional(),
-      productId: z2.number(),
+      productId: z2.number().optional(),
       quantity: z2.number().min(1).default(1),
       subtotal: z2.string(),
       shippingCost: z2.string().optional(),
       totalPrice: z2.string(),
-      pixKey: z2.string()
+      pixKey: z2.string().optional()
     })).mutation(async ({ input }) => {
       const orderNumber = `SA-${nanoid(8).toUpperCase()}`;
-      const result = await createOrder({
+      await createOrder({
         orderNumber,
         customerName: input.customerName,
         customerEmail: input.customerEmail || null,
         customerPhone: input.customerPhone || null,
-        customerCep: input.customerCep || null,
-        productId: input.productId,
-        quantity: input.quantity,
         subtotal: input.subtotal,
         shippingCost: input.shippingCost || "0",
         totalPrice: input.totalPrice,
-        pixKey: input.pixKey,
         status: "pending"
       });
       const order = await getOrderByNumber(orderNumber);
@@ -1154,7 +1349,70 @@ var appRouter = router({
     }),
     getByNumber: publicProcedure.input(z2.object({ orderNumber: z2.string() })).query(({ input }) => getOrderByNumber(input.orderNumber)),
     list: publicProcedure.query(() => getAllOrders()),
-    updateStatus: publicProcedure.input(z2.object({ orderId: z2.number(), status: z2.string() })).mutation(({ input }) => updateOrderStatus(input.orderId, input.status))
+    updateStatus: publicProcedure.input(z2.object({ orderId: z2.number(), status: z2.string() })).mutation(({ input }) => updateOrderStatus(input.orderId, input.status)),
+    /**
+     * Gerar etiqueta via Melhor Envio (ação do admin)
+     * Fluxo: adiciona ao carrinho ME → compra → gera → retorna URL do PDF
+     */
+    generateLabel: publicProcedure.input(z2.object({ orderId: z2.number() })).mutation(async ({ input }) => {
+      const order = await getOrderById(input.orderId);
+      if (!order) throw new TRPCError3({ code: "NOT_FOUND", message: "Pedido n\xE3o encontrado" });
+      if (!order.addressPostalCode || !order.addressStreet || !order.addressCity) {
+        throw new TRPCError3({ code: "BAD_REQUEST", message: "Pedido sem endere\xE7o completo para gerar etiqueta" });
+      }
+      if (order.shippingServiceId === null && order.shippingServiceName !== "Retirada no Local") {
+        throw new TRPCError3({ code: "BAD_REQUEST", message: "Pedido sem servi\xE7o de frete selecionado" });
+      }
+      if (order.shippingServiceName === "Retirada no Local" || order.shippingServiceId === null) {
+        await updateOrderLabelInfo(order.id, { status: "processing" });
+        return { success: true, labelUrl: null, message: "Pedido de retirada no local \u2014 sem etiqueta necess\xE1ria" };
+      }
+      try {
+        const { melhorEnvioOrderId, labelUrl } = await generateLabelForOrder({
+          id: order.id,
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          customerPhone: order.customerPhone,
+          customerDocument: order.customerDocument,
+          addressPostalCode: order.addressPostalCode,
+          addressStreet: order.addressStreet,
+          addressNumber: order.addressNumber,
+          addressComplement: order.addressComplement,
+          addressDistrict: order.addressDistrict,
+          addressCity: order.addressCity,
+          addressState: order.addressState,
+          shippingServiceId: order.shippingServiceId,
+          itemsSummary: order.itemsSummary,
+          totalPrice: String(order.totalPrice)
+        });
+        await updateOrderLabelInfo(order.id, {
+          melhorEnvioOrderId,
+          labelUrl,
+          status: "processing"
+        });
+        return { success: true, labelUrl, melhorEnvioOrderId };
+      } catch (err) {
+        console.error("[generateLabel] Erro:", err.message);
+        throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: err.message });
+      }
+    }),
+    /**
+     * Buscar rastreio de um pedido
+     */
+    getTracking: publicProcedure.input(z2.object({ orderId: z2.number() })).query(async ({ input }) => {
+      const order = await getOrderById(input.orderId);
+      if (!order) throw new TRPCError3({ code: "NOT_FOUND", message: "Pedido n\xE3o encontrado" });
+      if (!order.melhorEnvioOrderId) return { trackingCode: null, status: order.status };
+      try {
+        const tracking = await trackMelhorEnvioShipment(order.melhorEnvioOrderId);
+        if (tracking.trackingCode && tracking.trackingCode !== order.trackingCode) {
+          await updateOrderLabelInfo(order.id, { trackingCode: tracking.trackingCode });
+        }
+        return tracking;
+      } catch {
+        return { trackingCode: order.trackingCode, status: order.status };
+      }
+    })
   })
 });
 
@@ -1289,7 +1547,7 @@ async function calculateShippingHandler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   const MELHOR_ENVIO_TOKEN2 = process.env.MELHOR_ENVIO_TOKEN;
-  const ORIGIN_CEP2 = process.env.MELHOR_ENVIO_ORIGIN_CEP || "89227320";
+  const ORIGIN_CEP3 = process.env.MELHOR_ENVIO_ORIGIN_CEP || "89227320";
   const volumes = packages.map((pkg) => ({
     height: pkg.height || 15,
     width: pkg.width || 15,
@@ -1309,7 +1567,7 @@ async function calculateShippingHandler(req, res) {
           "User-Agent": "Santos Anjos 3D (contato@santosanjos3d.com.br)"
         },
         body: JSON.stringify({
-          from: { postal_code: ORIGIN_CEP2 },
+          from: { postal_code: ORIGIN_CEP3 },
           to: { postal_code: to_postal_code },
           volumes
         }),

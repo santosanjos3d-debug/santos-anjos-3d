@@ -3,13 +3,23 @@ import { Button } from '@/components/ui/button';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import ShippingCalculatorSimple from './ShippingCalculatorSimple';
+import CheckoutModal from './CheckoutModal';
+
+interface ShippingOption {
+  id: number | string;
+  name: string;
+  company: string;
+  price: string;
+  delivery_time: number;
+}
 
 export default function Cart() {
   const { cart, totalItems, totalPriceFormatted, removeItem, updateQuantity, clearCart } = useCartWithSync();
   const [isOpen, setIsOpen] = useState(false);
   const [cep, setCep] = useState('');
   const [shippingCost, setShippingCost] = useState(0);
-  const [shippingServiceName, setShippingServiceName] = useState('');
+  const [shippingService, setShippingService] = useState<ShippingOption | null>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const formatCEP = (value: string) => {
     const cleaned = value.replace(/\D/g, '');
@@ -17,10 +27,13 @@ export default function Cart() {
     return `${cleaned.slice(0, 5)}-${cleaned.slice(5, 8)}`;
   };
 
-  const handleShippingCalculated = (cost: number, serviceName: string) => {
+  const handleShippingCalculated = (cost: number, serviceName: string, service?: ShippingOption) => {
     setShippingCost(cost);
-    setShippingServiceName(serviceName);
+    setShippingService(service || null);
   };
+
+  const subtotalValue = parseFloat(totalPriceFormatted.replace('R$ ', '').replace(',', '.')) || 0;
+  const totalWithShipping = subtotalValue + shippingCost;
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
@@ -28,26 +41,11 @@ export default function Cart() {
       alert('Por favor, informe um CEP válido');
       return;
     }
-    if (shippingCost === 0) {
+    if (shippingCost === 0 && shippingService?.id !== 'retirada-local') {
       alert('Por favor, selecione uma opção de frete');
       return;
     }
-
-    // Build message with all cart items
-    const cartSummary = cart
-      .map((item: any) =>
-        `${item.productName} (${item.color}, ${item.sizeLabel}) - ${item.price} x ${item.quantity}`
-      )
-      .join('\n');
-
-    const cleanCEP = cep.replace(/\D/g, '');
-    const shippingFormatted = `R$ ${shippingCost.toFixed(2).replace('.', ',')}`;
-    const totalWithShipping = parseFloat(totalPriceFormatted.replace('R$ ', '').replace(',', '.')) + shippingCost;
-    const totalFormatted = `R$ ${totalWithShipping.toFixed(2).replace('.', ',')}`;
-    
-    const message = `Olá! Gostaria de fazer um pedido:\n\n${cartSummary}\n\n*Subtotal: ${totalPriceFormatted}*\n*Frete (${shippingServiceName}): ${shippingFormatted}*\n*Total: ${totalFormatted}*\n\nMeu CEP: ${cleanCEP}\n\nPor favor, envie o link de pagamento PIX.`;
-    const whatsappUrl = `https://wa.me/5547996641959?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    setShowCheckout(true);
   };
 
   return (
@@ -69,20 +67,14 @@ export default function Cart() {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex">
           {/* Overlay */}
-          <div
-            className="flex-1 bg-black/50"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="flex-1 bg-black/50" onClick={() => setIsOpen(false)} />
 
           {/* Cart Panel */}
           <div className="w-full max-w-md bg-white shadow-lg flex flex-col max-h-screen overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold">Carrinho</h2>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
+              <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-gray-100 rounded">
                 <X size={24} />
               </button>
             </div>
@@ -99,29 +91,18 @@ export default function Cart() {
                       <div key={index} className="flex gap-4 border rounded-lg p-4">
                         <div className="flex-1">
                           <p className="font-semibold">{item.productName}</p>
-                          <p className="text-sm text-gray-600">
-                            {item.color} • {item.sizeLabel}
-                          </p>
+                          <p className="text-sm text-gray-600">{item.color} • {item.sizeLabel}</p>
                           <p className="text-sm font-medium mt-2">{item.price}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
+                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:bg-gray-100 rounded">
                             <Minus size={16} />
                           </button>
                           <span className="w-8 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
+                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:bg-gray-100 rounded">
                             <Plus size={16} />
                           </button>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="p-1 hover:bg-red-100 rounded ml-2"
-                          >
+                          <button onClick={() => removeItem(item.id)} className="p-1 hover:bg-red-100 rounded ml-2">
                             <X size={16} className="text-red-500" />
                           </button>
                         </div>
@@ -145,7 +126,7 @@ export default function Cart() {
                   {cep.replace(/\D/g, '').length === 8 && (
                     <ShippingCalculatorSimple
                       cep={cep}
-                      cartItems={cart.map(item => ({ size: item.size, quantity: item.quantity }))}
+                      cartItems={cart.map((item: any) => ({ size: item.size, quantity: item.quantity }))}
                       onShippingCalculated={handleShippingCalculated}
                     />
                   )}
@@ -158,17 +139,19 @@ export default function Cart() {
                     </div>
                     {shippingCost > 0 && (
                       <div className="flex justify-between text-base">
-                        <span>Frete:</span>
+                        <span>Frete ({shippingService?.name}):</span>
                         <span>R$ {shippingCost.toFixed(2).replace('.', ',')}</span>
+                      </div>
+                    )}
+                    {shippingService?.id === 'retirada-local' && (
+                      <div className="flex justify-between text-base text-green-700">
+                        <span>Retirada no Local:</span>
+                        <span>Grátis</span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
                       <span>Total:</span>
-                      <span>
-                        {shippingCost > 0
-                          ? `R$ ${(parseFloat(totalPriceFormatted.replace('R$ ', '').replace(',', '.')) + shippingCost).toFixed(2).replace('.', ',')}`
-                          : totalPriceFormatted}
-                      </span>
+                      <span>R$ {totalWithShipping.toFixed(2).replace('.', ',')}</span>
                     </div>
                   </div>
                 </>
@@ -180,22 +163,37 @@ export default function Cart() {
               <div className="border-t p-6 space-y-3">
                 <Button
                   onClick={handleCheckout}
-                  disabled={!cep || cep.replace(/\D/g, '').length !== 8 || shippingCost === 0}
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={!cep || cep.replace(/\D/g, '').length !== 8 || (shippingCost === 0 && shippingService?.id !== 'retirada-local')}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 >
-                  Encomendar via WhatsApp
+                  Finalizar Pedido
                 </Button>
-                <Button
-                  onClick={clearCart}
-                  variant="outline"
-                  className="w-full"
-                >
+                <Button onClick={clearCart} variant="outline" className="w-full">
                   Limpar Carrinho
                 </Button>
               </div>
             )}
           </div>
         </div>
+      )}
+
+      {/* Checkout Modal */}
+      {showCheckout && (
+        <CheckoutModal
+          cart={cart}
+          subtotal={subtotalValue}
+          shippingCost={shippingCost}
+          shippingService={shippingService}
+          cep={cep}
+          onClose={() => setShowCheckout(false)}
+          onSuccess={() => {
+            clearCart();
+            setIsOpen(false);
+            setCep('');
+            setShippingCost(0);
+            setShippingService(null);
+          }}
+        />
       )}
     </>
   );

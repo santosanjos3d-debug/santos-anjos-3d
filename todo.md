@@ -165,3 +165,12 @@
 - [x] Verificar nomes exatos retornados pela API do Melhor Envio
 - [x] Filtrar API para retornar apenas as 5 opções desejadas (SEDEX id=2, Jadlog .Package id=3, Jadlog .Com id=4, JeT Standard id=33, Retirada)
 - [x] Testar e salvar checkpoint
+
+## Feature: Sistema de Pedidos com Etiqueta Automática (Melhor Envio)
+- [x] Criar schema do banco: tabelas orders com endereço completo, etiqueta e rastreio
+- [x] Criar tRPC procedures: createFull, list, updateStatus, generateLabel, getTracking
+- [x] Implementar CheckoutModal com formulário de endereço completo + busca ViaCEP
+- [x] Integrar Melhor Envio: adicionar ao carrinho → comprar → gerar → URL PDF
+- [x] Criar painel admin com gestão de status, geração de etiqueta e WhatsApp
+- [x] Enviar mensagem WhatsApp com resumo do pedido e endereço
+- [x] Testar fluxo completo (13 testes passando) e salvar checkpoint

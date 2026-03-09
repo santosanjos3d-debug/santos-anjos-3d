@@ -88,13 +88,9 @@ export default function Checkout({ productId, productName, productPrice, onClose
         customerName,
         customerEmail: customerEmail || undefined,
         customerPhone: customerPhone || undefined,
-        customerCep: customerCep || undefined,
-        productId,
-        quantity,
         subtotal: subtotal,
         shippingCost: shippingCost,
         totalPrice,
-        pixKey,
       });
 
       if (order) {

@@ -7,7 +7,7 @@ interface ShippingCalculatorProps {
     size: string;
     quantity: number;
   }>;
-  onShippingCalculated: (cost: number, serviceName: string) => void;
+  onShippingCalculated: (cost: number, serviceName: string, service?: ShippingService) => void;
 }
 
 interface ShippingService {
@@ -86,9 +86,9 @@ export default function ShippingCalculatorSimple({ cep, cartItems, onShippingCal
     fetchShipping();
   }, [cep, cartItems]);
 
-  const handleSelectService = (serviceId: string, price: string, name: string) => {
-    setSelectedService(serviceId);
-    onShippingCalculated(parseFloat(price), name);
+  const handleSelectService = (service: ShippingService) => {
+    setSelectedService(service.id);
+    onShippingCalculated(parseFloat(service.price), service.name, service);
   };
 
   if (cep.replace(/\D/g, '').length !== 8) {
@@ -128,7 +128,7 @@ export default function ShippingCalculatorSimple({ cep, cartItems, onShippingCal
       {services.map((service) => (
         <div
           key={service.id}
-          onClick={() => handleSelectService(service.id, service.price, service.name)}
+          onClick={() => handleSelectService(service)}
           className={`
             p-4 rounded-lg border-2 cursor-pointer transition-all
             ${selectedService === service.id 
