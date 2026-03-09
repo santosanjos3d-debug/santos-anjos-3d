@@ -1281,7 +1281,7 @@ var appRouter = router({
     createFull: publicProcedure.input(z2.object({
       customerName: z2.string().min(1),
       customerPhone: z2.string().min(1),
-      customerDocument: z2.string().optional(),
+      customerDocument: z2.string().min(11, "CPF inv\xE1lido"),
       addressPostalCode: z2.string().min(8),
       addressStreet: z2.string().min(1),
       addressNumber: z2.string().min(1),
@@ -1302,7 +1302,7 @@ var appRouter = router({
         orderNumber,
         customerName: input.customerName,
         customerPhone: input.customerPhone,
-        customerDocument: input.customerDocument || null,
+        customerDocument: input.customerDocument,
         addressPostalCode: input.addressPostalCode,
         addressStreet: input.addressStreet,
         addressNumber: input.addressNumber,

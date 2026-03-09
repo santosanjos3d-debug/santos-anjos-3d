@@ -181,3 +181,8 @@
 - [x] Tornar colunas legadas (productId, pixKey) nullable
 - [x] Adicionar valor 'shipped' ao ENUM de status
 - [x] Testar INSERT com sucesso e salvar checkpoint
+
+## Feature: CPF Obrigatório no Checkout
+- [x] Tornar campo CPF obrigatório no CheckoutModal (frontend)
+- [x] Atualizar validação no backend (routers.ts) para exigir customerDocument (min 11 dígitos)
+- [x] Salvar checkpoint

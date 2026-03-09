@@ -111,7 +111,7 @@ export default function CheckoutModal({
       const result = await createOrderMutation.mutateAsync({
         customerName,
         customerPhone,
-        customerDocument: customerDocument || undefined,
+        customerDocument: customerDocument,
         addressPostalCode: cep.replace(/\D/g, ''),
         addressStreet: street,
         addressNumber: number,
@@ -215,8 +215,8 @@ export default function CheckoutModal({
                   <Input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="(47) 99999-9999" required />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1 text-gray-600">CPF (opcional, para nota fiscal)</label>
-                  <Input value={customerDocument} onChange={e => setCustomerDocument(e.target.value)} placeholder="000.000.000-00" />
+                  <label className="block text-xs font-medium mb-1 text-gray-600">CPF *</label>
+                  <Input value={customerDocument} onChange={e => setCustomerDocument(e.target.value)} placeholder="000.000.000-00" required />
                 </div>
               </div>
 

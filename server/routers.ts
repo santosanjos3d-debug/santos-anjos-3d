@@ -98,7 +98,7 @@ export const appRouter = router({
       .input(z.object({
         customerName: z.string().min(1),
         customerPhone: z.string().min(1),
-        customerDocument: z.string().optional(),
+        customerDocument: z.string().min(11, 'CPF inválido'),
         addressPostalCode: z.string().min(8),
         addressStreet: z.string().min(1),
         addressNumber: z.string().min(1),
@@ -120,7 +120,7 @@ export const appRouter = router({
           orderNumber,
           customerName: input.customerName,
           customerPhone: input.customerPhone,
-          customerDocument: input.customerDocument || null,
+          customerDocument: input.customerDocument,
           addressPostalCode: input.addressPostalCode,
           addressStreet: input.addressStreet,
           addressNumber: input.addressNumber,
