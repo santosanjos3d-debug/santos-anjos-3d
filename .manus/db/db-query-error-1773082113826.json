@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO orders (orderNumber, customerName, customerPhone, customerDocument, addressPostalCode, addressStreet, addressNumber, addressComplement, addressDistrict, addressCity, addressState, shippingServiceId, shippingServiceName, shippingCompany, subtotal, shippingCost, totalPrice, itemsSummary, status) VALUES ('SA-TEST001', 'Teste Cliente', '47999999999', '05526634922', '89331805', 'Rua Robalo', '153', NULL, 'Vila da Glória', 'São Francisco do Sul', 'SC', 2, 'SEDEX', 'Correios', 39.47, 13.38, 52.85, '[{\"name\":\"Teste\",\"color\":\"Branco\",\"size\":\"P\",\"qty\":1,\"price\":\"39,47\"}]', 'pending');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4MHZiezXmddxnYm.3f6f84606b5a --database gVH8PYB7a8FdTTui9CMfPj --execute INSERT INTO orders (orderNumber, customerName, customerPhone, customerDocument, addressPostalCode, addressStreet, addressNumber, addressComplement, addressDistrict, addressCity, addressState, shippingServiceId, shippingServiceName, shippingCompany, subtotal, shippingCost, totalPrice, itemsSummary, status) VALUES ('SA-TEST001', 'Teste Cliente', '47999999999', '05526634922', '89331805', 'Rua Robalo', '153', NULL, 'Vila da Glória', 'São Francisco do Sul', 'SC', 2, 'SEDEX', 'Correios', 39.47, 13.38, 52.85, '[{\"name\":\"Teste\",\"color\":\"Branco\",\"size\":\"P\",\"qty\":1,\"price\":\"39,47\"}]', 'pending');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1364 (HY000) at line 1: Field 'productId' doesn't have a default value"
+  ]
+}

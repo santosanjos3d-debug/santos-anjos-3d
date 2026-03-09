@@ -43,6 +43,11 @@ export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   orderNumber: varchar("orderNumber", { length: 32 }).notNull().unique(),
 
+  // Colunas legadas (mantidas para compatibilidade)
+  productId: int("productId"),
+  quantity: int("quantity").default(1),
+  pixKey: varchar("pixKey", { length: 255 }),
+
   // Dados do cliente
   customerName: varchar("customerName", { length: 255 }).notNull(),
   customerEmail: varchar("customerEmail", { length: 320 }),

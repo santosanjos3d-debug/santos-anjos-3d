@@ -174,3 +174,10 @@
 - [x] Criar painel admin com gestão de status, geração de etiqueta e WhatsApp
 - [x] Enviar mensagem WhatsApp com resumo do pedido e endereço
 - [x] Testar fluxo completo (13 testes passando) e salvar checkpoint
+
+## Bug Fix: Erro INSERT orders - Schema não sincronizado
+- [x] Verificar schema atual da tabela orders no banco (17 colunas antigas vs 28 novas)
+- [x] Adicionar colunas novas via ALTER TABLE (endereço, frete, etiqueta)
+- [x] Tornar colunas legadas (productId, pixKey) nullable
+- [x] Adicionar valor 'shipped' ao ENUM de status
+- [x] Testar INSERT com sucesso e salvar checkpoint

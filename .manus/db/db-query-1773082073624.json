@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE orders\n  ADD COLUMN customerDocument varchar(20) NULL,\n  ADD COLUMN addressPostalCode varchar(9) NULL,\n  ADD COLUMN addressStreet varchar(255) NULL,\n  ADD COLUMN addressNumber varchar(20) NULL,\n  ADD COLUMN addressComplement varchar(100) NULL,\n  ADD COLUMN addressDistrict varchar(100) NULL,\n  ADD COLUMN addressCity varchar(100) NULL,\n  ADD COLUMN addressState varchar(2) NULL,\n  ADD COLUMN shippingServiceId int NULL,\n  ADD COLUMN shippingServiceName varchar(100) NULL,\n  ADD COLUMN shippingCompany varchar(100) NULL,\n  ADD COLUMN itemsSummary text NULL,\n  ADD COLUMN melhorEnvioOrderId varchar(100) NULL,\n  ADD COLUMN melhorEnvioProtocol varchar(100) NULL,\n  ADD COLUMN trackingCode varchar(50) NULL,\n  ADD COLUMN labelUrl text NULL;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4MHZiezXmddxnYm.3f6f84606b5a --database gVH8PYB7a8FdTTui9CMfPj --execute \nALTER TABLE orders\n  ADD COLUMN customerDocument varchar(20) NULL,\n  ADD COLUMN addressPostalCode varchar(9) NULL,\n  ADD COLUMN addressStreet varchar(255) NULL,\n  ADD COLUMN addressNumber varchar(20) NULL,\n  ADD COLUMN addressComplement varchar(100) NULL,\n  ADD COLUMN addressDistrict varchar(100) NULL,\n  ADD COLUMN addressCity varchar(100) NULL,\n  ADD COLUMN addressState varchar(2) NULL,\n  ADD COLUMN shippingServiceId int NULL,\n  ADD COLUMN shippingServiceName varchar(100) NULL,\n  ADD COLUMN shippingCompany varchar(100) NULL,\n  ADD COLUMN itemsSummary text NULL,\n  ADD COLUMN melhorEnvioOrderId varchar(100) NULL,\n  ADD COLUMN melhorEnvioProtocol varchar(100) NULL,\n  ADD COLUMN trackingCode varchar(50) NULL,\n  ADD COLUMN labelUrl text NULL;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2182
+}
