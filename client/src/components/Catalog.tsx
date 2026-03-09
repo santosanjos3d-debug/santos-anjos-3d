@@ -213,8 +213,9 @@ const PRODUCTS: Product[] = [
     details: 'Impressão 3D em PETG com filamento fundido. São Miguel é representado como protetor e guerreiro espiritual, com asas majestosas e lança. Símbolo de vitória sobre o mal.',
     price: '59,03',
     sizes: [
-      { size: 'P', label: 'Pequeno (94mm)', price: '59,03' },
-      { size: 'M', label: 'Médio (188mm)', price: '103,27' },
+      { size: 'P', label: 'Pequeno (144mm)', price: '59,03' },
+      { size: 'M', label: 'Médio (216mm)', price: '103,27' },
+      { size: 'G', label: 'Grande (288mm)', price: '213,43' },
     ],
     colors: [
       { name: 'Branco', value: 'white', image: '/images/sao-miguel-medio-edited.jpg' },

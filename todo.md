@@ -186,3 +186,8 @@
 - [x] Tornar campo CPF obrigatório no CheckoutModal (frontend)
 - [x] Atualizar validação no backend (routers.ts) para exigir customerDocument (min 11 dígitos)
 - [x] Salvar checkpoint
+
+## Feature: Atualizar São Miguel - Preços e Tamanhos
+- [x] Verificar estrutura de produtos/tamanhos no banco e código (definido no Catalog.tsx)
+- [x] Atualizar preços: P(144mm)=59,03 / M(216mm)=103,27 / G(288mm)=213,43
+- [x] Salvar checkpoint
