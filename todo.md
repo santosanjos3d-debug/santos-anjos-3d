@@ -210,3 +210,8 @@
 - [x] Adicionar procedure orders.delete no routers.ts
 - [x] Adicionar botão Excluir (vermelho, com confirmação) no painel Admin
 - [x] Salvar checkpoint (17 testes passando)
+
+## Bug Fix: Login Admin não funciona
+- [x] Diagnosticar: cookie-parser não configurado, req.cookies era undefined
+- [x] Corrigir: usar req.headers.cookie + parse manual (igual ao SDK do Manus)
+- [x] Testar: login + check retornam authenticated:true (17 testes passando)

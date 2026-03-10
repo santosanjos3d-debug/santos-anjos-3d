@@ -715,6 +715,7 @@ var systemRouter = router({
 import { z as z2 } from "zod";
 import bcrypt from "bcryptjs";
 import { SignJWT as SignJWT2, jwtVerify as jwtVerify2 } from "jose";
+import { parse as parseCookies } from "cookie";
 import { nanoid } from "nanoid";
 
 // server/melhorenvio.ts
@@ -1227,6 +1228,12 @@ var ADMIN_COOKIE = "sa3d_admin_token";
 var ADMIN_TOKEN_SECRET = new TextEncoder().encode(
   (ENV.cookieSecret || "fallback-secret-change-me") + "-admin"
 );
+function getAdminCookie(req) {
+  const cookieHeader = req.headers?.cookie;
+  if (!cookieHeader) return void 0;
+  const parsed = parseCookies(cookieHeader);
+  return parsed[ADMIN_COOKIE];
+}
 var appRouter = router({
   system: systemRouter,
   admin: router({
@@ -1276,7 +1283,7 @@ var appRouter = router({
      * Verificar se está autenticado como admin
      */
     check: publicProcedure.query(async ({ ctx }) => {
-      const token = ctx.req.cookies?.[ADMIN_COOKIE];
+      const token = getAdminCookie(ctx.req);
       if (!token) return { authenticated: false };
       try {
         await jwtVerify2(token, ADMIN_TOKEN_SECRET);

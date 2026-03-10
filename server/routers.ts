@@ -5,12 +5,22 @@ import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
+import { parse as parseCookies } from "cookie";
 import { ENV } from "./_core/env";
 
 const ADMIN_COOKIE = "sa3d_admin_token";
 const ADMIN_TOKEN_SECRET = new TextEncoder().encode(
   (ENV.cookieSecret || "fallback-secret-change-me") + "-admin"
 );
+
+// Helper para ler cookie do admin sem depender de cookie-parser
+function getAdminCookie(req: any): string | undefined {
+  const cookieHeader = req.headers?.cookie;
+  if (!cookieHeader) return undefined;
+  const parsed = parseCookies(cookieHeader);
+  return parsed[ADMIN_COOKIE];
+}
+
 import {
   getAllProducts,
   getProductById,
@@ -95,7 +105,7 @@ export const appRouter = router({
      * Verificar se está autenticado como admin
      */
     check: publicProcedure.query(async ({ ctx }) => {
-      const token = ctx.req.cookies?.[ADMIN_COOKIE];
+      const token = getAdminCookie(ctx.req);
       if (!token) return { authenticated: false };
       try {
         await jwtVerify(token, ADMIN_TOKEN_SECRET);
