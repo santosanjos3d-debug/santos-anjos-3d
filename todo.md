@@ -193,14 +193,20 @@
 - [x] Salvar checkpoint
 
 ## Feature: Deletar Pedido no Admin
-- [ ] Adicionar função deleteOrder no db.ts
-- [ ] Adicionar procedure orders.delete no routers.ts
-- [ ] Adicionar botão de exclusão com confirmação no painel Admin
-- [ ] Salvar checkpoint
+- [x] Função deleteOrder já existia no db.ts
+- [x] Adicionar procedure orders.delete no routers.ts
+- [x] Adicionar botão Excluir (vermelho, com confirmação) no painel Admin
+- [x] Salvar checkpoint (17 testes passando)
 
 ## Feature: Login Admin com Usuário e Senha
 - [x] Criar procedure admin.login no backend com bcrypt e JWT
 - [x] Criar página AdminLogin no frontend
 - [x] Proteger rota /admin com verificação de token admin
 - [x] Configurar credenciais via secrets (ADMIN_EMAIL + ADMIN_PASSWORD_HASH)
+- [x] Salvar checkpoint (17 testes passando)
+
+## Feature: Deletar Pedido no Admin
+- [x] Função deleteOrder já existia no db.ts
+- [x] Adicionar procedure orders.delete no routers.ts
+- [x] Adicionar botão Excluir (vermelho, com confirmação) no painel Admin
 - [x] Salvar checkpoint (17 testes passando)

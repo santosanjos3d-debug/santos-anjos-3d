@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Loader2, LogOut, Package, Tag, ExternalLink, RefreshCw,
-  MapPin, Phone, User, Truck, CheckCircle2, Clock, XCircle, AlertCircle
+  MapPin, Phone, User, Truck, CheckCircle2, Clock, XCircle, AlertCircle, Trash2
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -35,6 +35,10 @@ export default function Admin() {
     onSuccess: () => ordersQuery.refetch(),
   });
   const generateLabelMutation = trpc.orders.generateLabel.useMutation();
+  const deleteOrderMutation = trpc.orders.delete.useMutation({
+    onSuccess: () => ordersQuery.refetch(),
+  });
+  const [deletingOrder, setDeletingOrder] = useState<number | null>(null);
 
   const orders = ordersQuery.data || [];
   const filteredOrders = selectedStatus === 'all'
@@ -56,6 +60,18 @@ export default function Admin() {
 
   const handleStatusChange = async (orderId: number, newStatus: OrderStatus) => {
     await updateStatusMutation.mutateAsync({ orderId, status: newStatus });
+  };
+
+  const handleDeleteOrder = async (orderId: number, orderNumber: string) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o pedido ${orderNumber}? Esta ação não pode ser desfeita.`)) return;
+    setDeletingOrder(orderId);
+    try {
+      await deleteOrderMutation.mutateAsync({ orderId });
+    } catch (err: any) {
+      alert('Erro ao excluir pedido: ' + (err.message || 'Tente novamente.'));
+    } finally {
+      setDeletingOrder(null);
+    }
   };
 
   const handleGenerateLabel = async (orderId: number) => {
@@ -324,6 +340,21 @@ export default function Admin() {
                           {labelMsg.text}
                         </span>
                       )}
+
+                      {/* Deletar pedido */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
+                        disabled={deletingOrder === order.id}
+                        className="flex items-center gap-1 text-red-600 border-red-300 hover:bg-red-50 ml-auto"
+                      >
+                        {deletingOrder === order.id ? (
+                          <><Loader2 size={14} className="animate-spin" /> Excluindo...</>
+                        ) : (
+                          <><Trash2 size={14} /> Excluir</>
+                        )}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

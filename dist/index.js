@@ -212,6 +212,11 @@ async function updateOrderStatus(id, status) {
   if (!db) throw new Error("Database not available");
   return await db.update(orders).set({ status }).where(eq(orders.id, id));
 }
+async function deleteOrder(id) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.delete(orders).where(eq(orders.id, id));
+}
 async function updateOrderLabelInfo(id, data) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -1464,6 +1469,15 @@ var appRouter = router({
         console.error("[generateLabel] Erro:", err.message);
         throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: err.message });
       }
+    }),
+    /**
+     * Deletar pedido (ação do admin)
+     */
+    delete: publicProcedure.input(z2.object({ orderId: z2.number() })).mutation(async ({ input }) => {
+      const order = await getOrderById(input.orderId);
+      if (!order) throw new TRPCError3({ code: "NOT_FOUND", message: "Pedido n\xE3o encontrado" });
+      await deleteOrder(input.orderId);
+      return { success: true };
     }),
     /**
      * Buscar rastreio de um pedido

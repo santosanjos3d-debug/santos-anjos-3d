@@ -323,6 +323,18 @@ export const appRouter = router({
       }),
 
     /**
+     * Deletar pedido (ação do admin)
+     */
+    delete: publicProcedure
+      .input(z.object({ orderId: z.number() }))
+      .mutation(async ({ input }) => {
+        const order = await getOrderById(input.orderId);
+        if (!order) throw new TRPCError({ code: 'NOT_FOUND', message: 'Pedido não encontrado' });
+        await deleteOrder(input.orderId);
+        return { success: true };
+      }),
+
+    /**
      * Buscar rastreio de um pedido
      */
     getTracking: publicProcedure
