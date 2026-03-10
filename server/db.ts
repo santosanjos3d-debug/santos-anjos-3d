@@ -104,6 +104,12 @@ export async function updateOrderStatus(id: number, status: string) {
   return await db.update(orders).set({ status: status as any }).where(eq(orders.id, id));
 }
 
+export async function deleteOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.delete(orders).where(eq(orders.id, id));
+}
+
 export async function updateOrderLabelInfo(id: number, data: {
   melhorEnvioOrderId?: string;
   melhorEnvioProtocol?: string;

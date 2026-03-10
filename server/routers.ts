@@ -3,6 +3,14 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { SignJWT, jwtVerify } from "jose";
+import { ENV } from "./_core/env";
+
+const ADMIN_COOKIE = "sa3d_admin_token";
+const ADMIN_TOKEN_SECRET = new TextEncoder().encode(
+  (ENV.cookieSecret || "fallback-secret-change-me") + "-admin"
+);
 import {
   getAllProducts,
   getProductById,
@@ -12,6 +20,7 @@ import {
   getAllOrders,
   updateOrderStatus,
   updateOrderLabelInfo,
+  deleteOrder,
   calculateShippingCost,
   initializeShippingRates,
 } from "./db";
@@ -23,6 +32,80 @@ import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
+
+  admin: router({
+    /**
+     * Login do painel admin com e-mail e senha
+     */
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const adminEmail = ENV.adminEmail;
+        const adminHash = ENV.adminPasswordHash;
+
+        if (!adminEmail || !adminHash) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Admin não configurado' });
+        }
+
+        if (input.email !== adminEmail) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Credenciais inválidas' });
+        }
+
+        // Suporta tanto senha em texto simples quanto hash bcrypt
+        let valid = false;
+        if (adminHash.startsWith('$2b$') || adminHash.startsWith('$2a$')) {
+          valid = await bcrypt.compare(input.password, adminHash);
+        } else {
+          // Senha armazenada em texto simples (comparação direta)
+          valid = input.password === adminHash;
+        }
+        if (!valid) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Credenciais inválidas' });
+        }
+
+        const token = await new SignJWT({ role: 'admin', email: input.email })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setExpirationTime('7d')
+          .sign(ADMIN_TOKEN_SECRET);
+
+        const isProduction = ENV.isProduction;
+        ctx.res.cookie(ADMIN_COOKIE, token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          path: '/',
+        });
+
+        return { success: true };
+      }),
+
+    /**
+     * Logout do painel admin
+     */
+    logout: publicProcedure.mutation(({ ctx }) => {
+      ctx.res.clearCookie(ADMIN_COOKIE, { path: '/' });
+      return { success: true };
+    }),
+
+    /**
+     * Verificar se está autenticado como admin
+     */
+    check: publicProcedure.query(async ({ ctx }) => {
+      const token = ctx.req.cookies?.[ADMIN_COOKIE];
+      if (!token) return { authenticated: false };
+      try {
+        await jwtVerify(token, ADMIN_TOKEN_SECRET);
+        return { authenticated: true };
+      } catch {
+        return { authenticated: false };
+      }
+    }),
+  }),
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

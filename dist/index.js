@@ -108,7 +108,9 @@ var ENV = {
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? ""
+  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  adminEmail: process.env.ADMIN_EMAIL ?? "",
+  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH ?? ""
 };
 
 // server/db.ts
@@ -706,6 +708,8 @@ var systemRouter = router({
 
 // server/routers.ts
 import { z as z2 } from "zod";
+import bcrypt from "bcryptjs";
+import { SignJWT as SignJWT2, jwtVerify as jwtVerify2 } from "jose";
 import { nanoid } from "nanoid";
 
 // server/melhorenvio.ts
@@ -1214,8 +1218,69 @@ async function trackMelhorEnvioShipment(orderId) {
 
 // server/routers.ts
 import { TRPCError as TRPCError3 } from "@trpc/server";
+var ADMIN_COOKIE = "sa3d_admin_token";
+var ADMIN_TOKEN_SECRET = new TextEncoder().encode(
+  (ENV.cookieSecret || "fallback-secret-change-me") + "-admin"
+);
 var appRouter = router({
   system: systemRouter,
+  admin: router({
+    /**
+     * Login do painel admin com e-mail e senha
+     */
+    login: publicProcedure.input(z2.object({
+      email: z2.string().email(),
+      password: z2.string().min(1)
+    })).mutation(async ({ input, ctx }) => {
+      const adminEmail = ENV.adminEmail;
+      const adminHash = ENV.adminPasswordHash;
+      if (!adminEmail || !adminHash) {
+        throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Admin n\xE3o configurado" });
+      }
+      if (input.email !== adminEmail) {
+        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Credenciais inv\xE1lidas" });
+      }
+      let valid = false;
+      if (adminHash.startsWith("$2b$") || adminHash.startsWith("$2a$")) {
+        valid = await bcrypt.compare(input.password, adminHash);
+      } else {
+        valid = input.password === adminHash;
+      }
+      if (!valid) {
+        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Credenciais inv\xE1lidas" });
+      }
+      const token = await new SignJWT2({ role: "admin", email: input.email }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("7d").sign(ADMIN_TOKEN_SECRET);
+      const isProduction = ENV.isProduction;
+      ctx.res.cookie(ADMIN_COOKIE, token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1e3,
+        path: "/"
+      });
+      return { success: true };
+    }),
+    /**
+     * Logout do painel admin
+     */
+    logout: publicProcedure.mutation(({ ctx }) => {
+      ctx.res.clearCookie(ADMIN_COOKIE, { path: "/" });
+      return { success: true };
+    }),
+    /**
+     * Verificar se está autenticado como admin
+     */
+    check: publicProcedure.query(async ({ ctx }) => {
+      const token = ctx.req.cookies?.[ADMIN_COOKIE];
+      if (!token) return { authenticated: false };
+      try {
+        await jwtVerify2(token, ADMIN_TOKEN_SECRET);
+        return { authenticated: true };
+      } catch {
+        return { authenticated: false };
+      }
+    })
+  }),
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

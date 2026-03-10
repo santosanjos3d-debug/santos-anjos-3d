@@ -191,3 +191,16 @@
 - [x] Verificar estrutura de produtos/tamanhos no banco e código (definido no Catalog.tsx)
 - [x] Atualizar preços: P(144mm)=59,03 / M(216mm)=103,27 / G(288mm)=213,43
 - [x] Salvar checkpoint
+
+## Feature: Deletar Pedido no Admin
+- [ ] Adicionar função deleteOrder no db.ts
+- [ ] Adicionar procedure orders.delete no routers.ts
+- [ ] Adicionar botão de exclusão com confirmação no painel Admin
+- [ ] Salvar checkpoint
+
+## Feature: Login Admin com Usuário e Senha
+- [x] Criar procedure admin.login no backend com bcrypt e JWT
+- [x] Criar página AdminLogin no frontend
+- [x] Proteger rota /admin com verificação de token admin
+- [x] Configurar credenciais via secrets (ADMIN_EMAIL + ADMIN_PASSWORD_HASH)
+- [x] Salvar checkpoint (17 testes passando)

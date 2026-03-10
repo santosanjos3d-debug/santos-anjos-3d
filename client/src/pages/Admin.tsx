@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +7,7 @@ import {
   Loader2, LogOut, Package, Tag, ExternalLink, RefreshCw,
   MapPin, Phone, User, Truck, CheckCircle2, Clock, XCircle, AlertCircle
 } from 'lucide-react';
-import { getLoginUrl } from '@/const';
+import { useLocation } from 'wouter';
 
 type OrderStatus = 'pending' | 'paid' | 'processing' | 'shipped' | 'completed' | 'cancelled';
 
@@ -22,10 +21,14 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; icon: R
 };
 
 export default function Admin() {
-  const { user, logout, isAuthenticated, loading } = useAuth();
+  const [, navigate] = useLocation();
+  const adminCheckQuery = trpc.admin.check.useQuery();
+  const adminLogoutMutation = trpc.admin.logout.useMutation({
+    onSuccess: () => navigate('/admin/login'),
+  });
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all');
   const [generatingLabel, setGeneratingLabel] = useState<number | null>(null);
-  const [labelMessages, setLabelMessages] = useState<Record<number, { type: 'success' | 'error'; text: string }>>({});
+  const [labelMessages, setLabelMessages] = useState<Record<number, { type: 'success' | 'error'; text: string }>>({}); 
 
   const ordersQuery = trpc.orders.list.useQuery(undefined, { refetchInterval: 30000 });
   const updateStatusMutation = trpc.orders.updateStatus.useMutation({
@@ -38,7 +41,7 @@ export default function Admin() {
     ? orders
     : orders.filter(o => o.status === selectedStatus);
 
-  if (loading) {
+  if (adminCheckQuery.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin text-amber-600" size={40} />
@@ -46,22 +49,9 @@ export default function Admin() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle className="text-center">Área Administrativa</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-gray-600 text-sm">Faça login para acessar o painel de pedidos.</p>
-            <Button asChild className="w-full bg-amber-600 hover:bg-amber-700">
-              <a href={getLoginUrl()}>Entrar com Manus</a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  if (!adminCheckQuery.data?.authenticated) {
+    navigate('/admin/login');
+    return null;
   }
 
   const handleStatusChange = async (orderId: number, newStatus: OrderStatus) => {
@@ -114,8 +104,8 @@ export default function Admin() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 hidden sm:block">{user?.name}</span>
-            <Button variant="outline" size="sm" onClick={logout} className="flex items-center gap-1">
+            <span className="text-sm text-gray-600 hidden sm:block">Administrador</span>
+            <Button variant="outline" size="sm" onClick={() => adminLogoutMutation.mutate()} className="flex items-center gap-1">
               <LogOut size={14} /> Sair
             </Button>
           </div>
