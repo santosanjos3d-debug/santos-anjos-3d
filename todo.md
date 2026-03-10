@@ -215,3 +215,12 @@
 - [x] Diagnosticar: cookie-parser não configurado, req.cookies era undefined
 - [x] Corrigir: usar req.headers.cookie + parse manual (igual ao SDK do Manus)
 - [x] Testar: login + check retornam authenticated:true (17 testes passando)
+
+## Bug Fix: Botão Excluir não aparece no Admin
+- [ ] Verificar Admin.tsx e corrigir visibilidade do botão
+- [ ] Salvar checkpoint
+
+## Bug Fix: Geração de Etiqueta ME - CPF e cidade do remetente
+- [x] Corrigir payload do remetente: adicionar address, number, district, city, state_abbr, country_id
+- [x] Atualizar CPF para 05526634922 e endereço: Rua Arthur Zoefeldt 307, Iririú, Joinville/SC
+- [x] Salvar checkpoint (17 testes passando)

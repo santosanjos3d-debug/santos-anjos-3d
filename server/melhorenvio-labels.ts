@@ -12,16 +12,20 @@
 const ME_BASE_URL = 'https://melhorenvio.com.br/api/v2';
 const ORIGIN_CEP = process.env.MELHOR_ENVIO_ORIGIN_CEP || '89227320';
 
-// Dados do remetente (loja)
+// Dados do remetente (loja) — endereço completo obrigatório para geração de etiqueta
 const SENDER = {
   name: 'Santos Anjos 3D',
   phone: '47996641959',
-  email: 'contato@santosanjos3d.com.br',
-  document: process.env.MELHOR_ENVIO_DOCUMENT || '', // CPF ou CNPJ da loja
-  address: {
-    postal_code: ORIGIN_CEP,
-    // Estes campos são preenchidos automaticamente pelo Melhor Envio via CEP
-  },
+  email: 'santos.anjos3d@gmail.com',
+  document: process.env.MELHOR_ENVIO_DOCUMENT || '05526634922',
+  address: 'Rua Arthur Zoefeldt',
+  number: '307',
+  complement: '',
+  district: 'Iririú',
+  city: 'Joinville',
+  state_abbr: 'SC',
+  postal_code: ORIGIN_CEP,
+  country_id: 'BR',
 };
 
 function getHeaders() {
@@ -80,9 +84,15 @@ export async function addToMelhorEnvioCart(order: OrderForLabel): Promise<string
       name: SENDER.name,
       phone: SENDER.phone,
       email: SENDER.email,
-      document: SENDER.document || undefined,
-      address: ORIGIN_CEP,
-      postal_code: ORIGIN_CEP,
+      document: SENDER.document,
+      address: SENDER.address,
+      number: SENDER.number,
+      complement: SENDER.complement || undefined,
+      district: SENDER.district,
+      city: SENDER.city,
+      state_abbr: SENDER.state_abbr,
+      postal_code: SENDER.postal_code,
+      country_id: SENDER.country_id,
     },
     to: {
       name: order.customerName,
