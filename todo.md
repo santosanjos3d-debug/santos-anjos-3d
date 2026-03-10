@@ -224,3 +224,9 @@
 - [x] Corrigir payload do remetente: adicionar address, number, district, city, state_abbr, country_id
 - [x] Atualizar CPF para 05526634922 e endereço: Rua Arthur Zoefeldt 307, Iririú, Joinville/SC
 - [x] Salvar checkpoint (17 testes passando)
+
+## Bug Fix: CPF do remetente rejeitado pelo Melhor Envio
+- [x] CPF 05526634922 é matematicamente válido
+- [x] Problema: MELHOR_ENVIO_DOCUMENT tinha valor antigo 05526634900 (inválido)
+- [x] Corrigido: atualizado secret para 05526634922 via webdev_request_secrets
+- [x] Salvar checkpoint (17 testes passando)
