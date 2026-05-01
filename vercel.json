@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install && pnpm run build:frontend && mkdir -p public && cp -r client/dist/* public/",
-  "outputDirectory": "public",
+  "buildCommand": "pnpm install && pnpm run build:frontend",
+  "outputDirectory": "dist/public",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }

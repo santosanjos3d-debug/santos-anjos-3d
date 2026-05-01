@@ -249,3 +249,13 @@
 - [x] Criar funções serverless: generate-label (Melhor Envio)
 - [x] Atualizar frontend para usar as novas APIs serverless (Catalog, CheckoutModal, AdminLogin, Admin, AdminProducts)
 - [x] Testar build completo e fazer commit para Vercel
+
+## Publicação no Vercel
+- [x] Analisar estrutura atual e identificar adaptações necessárias
+- [x] Criar vercel.json com configuração correta de rotas e build (outputDirectory: dist/public)
+- [x] Adaptar servidor Express para Vercel Functions (serverless) - pasta api/ já existia
+- [x] Verificar build completo para Vercel (pnpm run build:frontend → dist/public)
+- [x] Corrigir upload-image.js para aceitar filename/base64Data do frontend
+- [x] Corrigir banco de dados: coluna details adicionada e migração aplicada
+- [ ] Configurar variáveis de ambiente no Vercel
+- [ ] Deploy e validar funcionamento em produção

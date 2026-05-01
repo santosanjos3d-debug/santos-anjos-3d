@@ -32,10 +32,13 @@ export default async function handler(req, res) {
   if (!ok) return;
 
   try {
-    const { fileName, fileData, contentType } = req.body || {};
+    // Aceitar tanto fileName/fileData quanto filename/base64Data (compatibilidade)
+    const fileName = req.body?.fileName || req.body?.filename;
+    const fileData = req.body?.fileData || req.body?.base64Data;
+    const contentType = req.body?.contentType;
 
     if (!fileName || !fileData) {
-      return res.status(400).json({ error: 'fileName e fileData são obrigatórios' });
+      return res.status(400).json({ error: 'fileName/filename e fileData/base64Data são obrigatórios' });
     }
 
     // fileData deve ser base64
