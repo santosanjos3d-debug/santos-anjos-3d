@@ -1,3 +1,115 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// server/_core/env.ts
+var ENV;
+var init_env = __esm({
+  "server/_core/env.ts"() {
+    "use strict";
+    ENV = {
+      appId: process.env.VITE_APP_ID ?? "",
+      cookieSecret: process.env.JWT_SECRET ?? "",
+      databaseUrl: process.env.DATABASE_URL ?? "",
+      oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
+      ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
+      isProduction: process.env.NODE_ENV === "production",
+      forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
+      forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+      adminEmail: process.env.ADMIN_EMAIL ?? "",
+      adminPasswordHash: process.env.ADMIN_PASSWORD_HASH ?? ""
+    };
+  }
+});
+
+// server/storage.ts
+var storage_exports = {};
+__export(storage_exports, {
+  storageGet: () => storageGet,
+  storagePut: () => storagePut
+});
+function getStorageConfig() {
+  const baseUrl = ENV.forgeApiUrl;
+  const apiKey = ENV.forgeApiKey;
+  if (!baseUrl || !apiKey) {
+    throw new Error(
+      "Storage proxy credentials missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY"
+    );
+  }
+  return { baseUrl: baseUrl.replace(/\/+$/, ""), apiKey };
+}
+function buildUploadUrl(baseUrl, relKey) {
+  const url = new URL("v1/storage/upload", ensureTrailingSlash(baseUrl));
+  url.searchParams.set("path", normalizeKey(relKey));
+  return url;
+}
+async function buildDownloadUrl(baseUrl, relKey, apiKey) {
+  const downloadApiUrl = new URL(
+    "v1/storage/downloadUrl",
+    ensureTrailingSlash(baseUrl)
+  );
+  downloadApiUrl.searchParams.set("path", normalizeKey(relKey));
+  const response = await fetch(downloadApiUrl, {
+    method: "GET",
+    headers: buildAuthHeaders(apiKey)
+  });
+  return (await response.json()).url;
+}
+function ensureTrailingSlash(value) {
+  return value.endsWith("/") ? value : `${value}/`;
+}
+function normalizeKey(relKey) {
+  return relKey.replace(/^\/+/, "");
+}
+function toFormData(data, contentType, fileName) {
+  const blob = typeof data === "string" ? new Blob([data], { type: contentType }) : new Blob([data], { type: contentType });
+  const form = new FormData();
+  form.append("file", blob, fileName || "file");
+  return form;
+}
+function buildAuthHeaders(apiKey) {
+  return { Authorization: `Bearer ${apiKey}` };
+}
+async function storagePut(relKey, data, contentType = "application/octet-stream") {
+  const { baseUrl, apiKey } = getStorageConfig();
+  const key = normalizeKey(relKey);
+  const uploadUrl = buildUploadUrl(baseUrl, key);
+  const formData = toFormData(data, contentType, key.split("/").pop() ?? key);
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: buildAuthHeaders(apiKey),
+    body: formData
+  });
+  if (!response.ok) {
+    const message = await response.text().catch(() => response.statusText);
+    throw new Error(
+      `Storage upload failed (${response.status} ${response.statusText}): ${message}`
+    );
+  }
+  const url = (await response.json()).url;
+  return { key, url };
+}
+async function storageGet(relKey) {
+  const { baseUrl, apiKey } = getStorageConfig();
+  const key = normalizeKey(relKey);
+  return {
+    key,
+    url: await buildDownloadUrl(baseUrl, key, apiKey)
+  };
+}
+var init_storage = __esm({
+  "server/storage.ts"() {
+    "use strict";
+    init_env();
+  }
+});
+
 // server/_core/index.ts
 import "dotenv/config";
 import express2 from "express";
@@ -33,9 +145,27 @@ var products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  image: varchar("image", { length: 512 }),
+  details: text("details"),
   category: varchar("category", { length: 100 }),
+  // Imagem principal
+  image: varchar("image", { length: 512 }),
+  // Preço base (menor tamanho)
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  // Dimensões para cálculo de frete (em cm)
+  widthCm: decimal("widthCm", { precision: 6, scale: 2 }),
+  heightCm: decimal("heightCm", { precision: 6, scale: 2 }),
+  lengthCm: decimal("lengthCm", { precision: 6, scale: 2 }),
+  // Peso para cálculo de frete (em gramas)
+  weightGrams: int("weightGrams"),
+  // Variações de tamanho e cor em JSON
+  // sizes: [{size: 'P', label: 'Pequeno (144mm)', price: '39.47'}]
+  sizes: text("sizes"),
+  // colors: [{name: 'Branco', value: 'white', image: '/images/...'}]
+  colors: text("colors"),
+  // Controle
+  active: int("active").default(1).notNull(),
+  // 1=ativo, 0=inativo
+  sortOrder: int("sortOrder").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
 });
@@ -99,21 +229,8 @@ var shippingRates = mysqlTable("shippingRates", {
   createdAt: timestamp("createdAt").defaultNow().notNull()
 });
 
-// server/_core/env.ts
-var ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
-  cookieSecret: process.env.JWT_SECRET ?? "",
-  databaseUrl: process.env.DATABASE_URL ?? "",
-  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
-  ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
-  isProduction: process.env.NODE_ENV === "production",
-  forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
-  adminEmail: process.env.ADMIN_EMAIL ?? "",
-  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH ?? ""
-};
-
 // server/db.ts
+init_env();
 var _db = null;
 async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
@@ -183,6 +300,21 @@ async function getProductById(id) {
   if (!db) return void 0;
   const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
   return result.length > 0 ? result[0] : void 0;
+}
+async function createProduct(data) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(products).values(data);
+}
+async function updateProduct(id, data) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(products).set({ ...data, updatedAt: /* @__PURE__ */ new Date() }).where(eq(products.id, id));
+}
+async function deleteProduct(id) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(products).where(eq(products.id, id));
 }
 async function createOrder(order) {
   const db = await getDb();
@@ -314,6 +446,7 @@ var ForbiddenError = (msg) => new HttpError(403, msg);
 import axios from "axios";
 import { parse as parseCookieHeader } from "cookie";
 import { SignJWT, jwtVerify } from "jose";
+init_env();
 var isNonEmptyString = (value) => typeof value === "string" && value.length > 0;
 var EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 var GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
@@ -572,6 +705,7 @@ function registerOAuthRoutes(app) {
 import { z } from "zod";
 
 // server/_core/notification.ts
+init_env();
 import { TRPCError } from "@trpc/server";
 var TITLE_MAX_LENGTH = 1200;
 var CONTENT_MAX_LENGTH = 2e4;
@@ -712,6 +846,7 @@ var systemRouter = router({
 });
 
 // server/routers.ts
+init_env();
 import { z as z2 } from "zod";
 import bcrypt from "bcryptjs";
 import { SignJWT as SignJWT2, jwtVerify as jwtVerify2 } from "jose";
@@ -1312,7 +1447,92 @@ var appRouter = router({
   }),
   products: router({
     list: publicProcedure.query(() => getAllProducts()),
-    getById: publicProcedure.input(z2.object({ id: z2.number() })).query(({ input }) => getProductById(input.id))
+    getById: publicProcedure.input(z2.object({ id: z2.number() })).query(({ input }) => getProductById(input.id)),
+    /**
+     * Criar novo produto (admin)
+     */
+    create: publicProcedure.input(z2.object({
+      name: z2.string().min(1),
+      description: z2.string().optional(),
+      details: z2.string().optional(),
+      category: z2.string().optional(),
+      image: z2.string().optional(),
+      price: z2.string(),
+      widthCm: z2.string().optional(),
+      heightCm: z2.string().optional(),
+      lengthCm: z2.string().optional(),
+      weightGrams: z2.number().optional(),
+      sizes: z2.string().optional(),
+      // JSON string
+      colors: z2.string().optional(),
+      // JSON string
+      active: z2.number().default(1),
+      sortOrder: z2.number().default(0)
+    })).mutation(async ({ input }) => {
+      await createProduct({
+        name: input.name,
+        description: input.description || null,
+        details: input.details || null,
+        category: input.category || null,
+        image: input.image || null,
+        price: input.price,
+        widthCm: input.widthCm || null,
+        heightCm: input.heightCm || null,
+        lengthCm: input.lengthCm || null,
+        weightGrams: input.weightGrams || null,
+        sizes: input.sizes || null,
+        colors: input.colors || null,
+        active: input.active,
+        sortOrder: input.sortOrder
+      });
+      return { success: true };
+    }),
+    /**
+     * Atualizar produto (admin)
+     */
+    update: publicProcedure.input(z2.object({
+      id: z2.number(),
+      name: z2.string().min(1).optional(),
+      description: z2.string().optional(),
+      details: z2.string().optional(),
+      category: z2.string().optional(),
+      image: z2.string().optional(),
+      price: z2.string().optional(),
+      widthCm: z2.string().optional(),
+      heightCm: z2.string().optional(),
+      lengthCm: z2.string().optional(),
+      weightGrams: z2.number().optional(),
+      sizes: z2.string().optional(),
+      colors: z2.string().optional(),
+      active: z2.number().optional(),
+      sortOrder: z2.number().optional()
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await updateProduct(id, data);
+      return { success: true };
+    }),
+    /**
+     * Deletar produto (admin)
+     */
+    delete: publicProcedure.input(z2.object({ id: z2.number() })).mutation(async ({ input }) => {
+      await deleteProduct(input.id);
+      return { success: true };
+    }),
+    /**
+     * Upload de imagem de produto via S3
+     */
+    uploadImage: publicProcedure.input(z2.object({
+      filename: z2.string(),
+      contentType: z2.string(),
+      base64Data: z2.string()
+    })).mutation(async ({ input }) => {
+      const { storagePut: storagePut2 } = await Promise.resolve().then(() => (init_storage(), storage_exports));
+      const buffer = Buffer.from(input.base64Data, "base64");
+      const ext = input.filename.split(".").pop() || "jpg";
+      const key = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { url } = await storagePut2(key, buffer, input.contentType);
+      return { url };
+    })
   }),
   shipping: router({
     calculateCost: publicProcedure.input(z2.object({ cep: z2.string(), weight: z2.number() })).query(async ({ input }) => calculateShippingCost(input.cep, input.weight)),

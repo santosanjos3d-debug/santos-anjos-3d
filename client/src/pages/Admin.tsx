@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Loader2, LogOut, Package, Tag, ExternalLink, RefreshCw, ShoppingBag,
   MapPin, Phone, User, Truck, CheckCircle2, Clock, XCircle, AlertCircle, Trash2
@@ -22,51 +21,88 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; icon: R
 
 export default function Admin() {
   const [, navigate] = useLocation();
-  const adminCheckQuery = trpc.admin.check.useQuery();
-  const adminLogoutMutation = trpc.admin.logout.useMutation({
-    onSuccess: () => navigate('/admin/login'),
-  });
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all');
   const [generatingLabel, setGeneratingLabel] = useState<number | null>(null);
-  const [labelMessages, setLabelMessages] = useState<Record<number, { type: 'success' | 'error'; text: string }>>({}); 
-
-  const ordersQuery = trpc.orders.list.useQuery(undefined, { refetchInterval: 30000 });
-  const updateStatusMutation = trpc.orders.updateStatus.useMutation({
-    onSuccess: () => ordersQuery.refetch(),
-  });
-  const generateLabelMutation = trpc.orders.generateLabel.useMutation();
-  const deleteOrderMutation = trpc.orders.delete.useMutation({
-    onSuccess: () => ordersQuery.refetch(),
-  });
+  const [labelMessages, setLabelMessages] = useState<Record<number, { type: 'success' | 'error'; text: string }>>({});
   const [deletingOrder, setDeletingOrder] = useState<number | null>(null);
 
-  const orders = ordersQuery.data || [];
-  const filteredOrders = selectedStatus === 'all'
-    ? orders
-    : orders.filter(o => o.status === selectedStatus);
+  // Verificar autenticação
+  useEffect(() => {
+    fetch('/api/admin-check', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        } else {
+          navigate('/admin/login');
+        }
+      })
+      .catch(() => navigate('/admin/login'))
+      .finally(() => setAuthChecked(true));
+  }, [navigate]);
 
-  if (adminCheckQuery.isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-amber-600" size={40} />
-      </div>
-    );
-  }
+  // Carregar pedidos
+  const fetchOrders = useCallback(async () => {
+    setIsFetching(true);
+    try {
+      const res = await fetch('/api/orders', { credentials: 'include' });
+      if (res.status === 401) {
+        navigate('/admin/login');
+        return;
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) setOrders(data);
+    } catch (err) {
+      console.error('Erro ao carregar pedidos:', err);
+    } finally {
+      setIsFetching(false);
+      setIsLoadingOrders(false);
+    }
+  }, [navigate]);
 
-  if (!adminCheckQuery.data?.authenticated) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchOrders();
+      const interval = setInterval(fetchOrders, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchOrders]);
+
+  const handleLogout = async () => {
+    await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
     navigate('/admin/login');
-    return null;
-  }
+  };
 
   const handleStatusChange = async (orderId: number, newStatus: OrderStatus) => {
-    await updateStatusMutation.mutateAsync({ orderId, status: newStatus });
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Erro ao atualizar status');
+      fetchOrders();
+    } catch (err: any) {
+      alert('Erro ao atualizar status: ' + (err.message || 'Tente novamente.'));
+    }
   };
 
   const handleDeleteOrder = async (orderId: number, orderNumber: string) => {
     if (!window.confirm(`Tem certeza que deseja excluir o pedido ${orderNumber}? Esta ação não pode ser desfeita.`)) return;
     setDeletingOrder(orderId);
     try {
-      await deleteOrderMutation.mutateAsync({ orderId });
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Erro ao excluir pedido');
+      fetchOrders();
     } catch (err: any) {
       alert('Erro ao excluir pedido: ' + (err.message || 'Tente novamente.'));
     } finally {
@@ -78,7 +114,14 @@ export default function Admin() {
     setGeneratingLabel(orderId);
     setLabelMessages(prev => ({ ...prev, [orderId]: undefined as any }));
     try {
-      const result = await generateLabelMutation.mutateAsync({ orderId });
+      const res = await fetch('/api/generate-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+        credentials: 'include',
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Erro ao gerar etiqueta');
       if (result.labelUrl) {
         setLabelMessages(prev => ({
           ...prev,
@@ -91,7 +134,7 @@ export default function Admin() {
           [orderId]: { type: 'success', text: result.message || 'Pedido de retirada — sem etiqueta.' },
         }));
       }
-      ordersQuery.refetch();
+      fetchOrders();
     } catch (err: any) {
       setLabelMessages(prev => ({
         ...prev,
@@ -101,6 +144,20 @@ export default function Admin() {
       setGeneratingLabel(null);
     }
   };
+
+  const filteredOrders = selectedStatus === 'all'
+    ? orders
+    : orders.filter(o => o.status === selectedStatus);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-amber-600" size={40} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
 
   const statusCounts = orders.reduce((acc, o) => {
     acc[o.status as OrderStatus] = (acc[o.status as OrderStatus] || 0) + 1;
@@ -124,7 +181,7 @@ export default function Admin() {
               <ShoppingBag size={14} /> Produtos
             </Button>
             <span className="text-sm text-gray-600 hidden sm:block">Administrador</span>
-            <Button variant="outline" size="sm" onClick={() => adminLogoutMutation.mutate()} className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
               <LogOut size={14} /> Sair
             </Button>
           </div>
@@ -164,17 +221,17 @@ export default function Admin() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => ordersQuery.refetch()}
-            disabled={ordersQuery.isFetching}
+            onClick={fetchOrders}
+            disabled={isFetching}
             className="flex items-center gap-1"
           >
-            <RefreshCw size={14} className={ordersQuery.isFetching ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
             Atualizar
           </Button>
         </div>
 
         {/* Lista de pedidos */}
-        {ordersQuery.isLoading ? (
+        {isLoadingOrders ? (
           <div className="flex justify-center py-12">
             <Loader2 className="animate-spin text-amber-600" size={32} />
           </div>

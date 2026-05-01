@@ -240,3 +240,12 @@
 - [x] Adicionar botão 'Produtos' no cabeçalho do Admin e rota /admin/products
 - [x] Atualizar Catálogo para carregar produtos dinamicamente do banco
 - [x] Testar fluxo completo (17 testes passando) e salvar checkpoint
+
+## Migração Completa para Vercel Serverless
+- [x] Analisar APIs existentes e mapear o que precisa ser migrado
+- [x] Criar funções serverless: admin/login, admin/logout, admin/check
+- [x] Criar funções serverless: products (list, create, update, delete, upload)
+- [x] Criar funções serverless: orders (create, list, update-status, delete)
+- [x] Criar funções serverless: generate-label (Melhor Envio)
+- [x] Atualizar frontend para usar as novas APIs serverless (Catalog, CheckoutModal, AdminLogin, Admin, AdminProducts)
+- [x] Testar build completo e fazer commit para Vercel

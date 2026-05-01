@@ -1,5 +1,4 @@
-import { useState, useRef } from "react";
-import { trpc } from "@/lib/trpc";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,29 +76,28 @@ export default function AdminProducts() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const colorFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [products, setProducts] = useState<any[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingColorIdx, setUploadingColorIdx] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const { data: products, refetch } = trpc.products.list.useQuery();
-  const createMutation = trpc.products.create.useMutation({
-    onSuccess: () => { refetch(); setIsFormOpen(false); toast.success("Produto criado com sucesso!"); },
-    onError: (e) => toast.error("Erro ao criar produto: " + e.message),
-  });
-  const updateMutation = trpc.products.update.useMutation({
-    onSuccess: () => { refetch(); setIsFormOpen(false); toast.success("Produto atualizado!"); },
-    onError: (e) => toast.error("Erro ao atualizar: " + e.message),
-  });
-  const deleteMutation = trpc.products.delete.useMutation({
-    onSuccess: () => { refetch(); setDeletingId(null); toast.success("Produto excluído."); },
-    onError: (e) => toast.error("Erro ao excluir: " + e.message),
-  });
-  const uploadImageMutation = trpc.products.uploadImage.useMutation({
-    onError: (e) => toast.error("Erro no upload: " + e.message),
-  });
+  const fetchProducts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/products', { credentials: 'include' });
+      const data = await res.json();
+      if (Array.isArray(data)) setProducts(data);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   function openCreate() {
     setEditingId(null);
@@ -120,8 +118,12 @@ export default function AdminProducts() {
       heightCm: product.heightCm || "",
       lengthCm: product.lengthCm || "",
       weightGrams: product.weightGrams ? String(product.weightGrams) : "",
-      sizes: product.sizes ? JSON.parse(product.sizes) : EMPTY_FORM.sizes,
-      colors: product.colors ? JSON.parse(product.colors) : EMPTY_FORM.colors,
+      sizes: product.sizes
+        ? (Array.isArray(product.sizes) ? product.sizes : JSON.parse(product.sizes))
+        : EMPTY_FORM.sizes,
+      colors: product.colors
+        ? (Array.isArray(product.colors) ? product.colors : JSON.parse(product.colors))
+        : EMPTY_FORM.colors,
       active: product.active ?? 1,
       sortOrder: product.sortOrder ? String(product.sortOrder) : "0",
     });
@@ -132,12 +134,23 @@ export default function AdminProducts() {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const base64 = (e.target?.result as string).split(",")[1];
-      const result = await uploadImageMutation.mutateAsync({
-        filename: file.name,
-        contentType: file.type,
-        base64Data: base64,
-      });
-      onUrl(result.url);
+      try {
+        const res = await fetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            base64Data: base64,
+          }),
+          credentials: 'include',
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Erro no upload');
+        onUrl(result.url);
+      } catch (err: any) {
+        toast.error("Erro no upload: " + err.message);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -199,6 +212,7 @@ export default function AdminProducts() {
   }
 
   async function handleSubmit() {
+    setIsSaving(true);
     const payload = {
       name: form.name,
       description: form.description || undefined,
@@ -216,14 +230,52 @@ export default function AdminProducts() {
       sortOrder: parseInt(form.sortOrder) || 0,
     };
 
-    if (editingId !== null) {
-      await updateMutation.mutateAsync({ id: editingId, ...payload });
-    } else {
-      await createMutation.mutateAsync(payload);
+    try {
+      let res: Response;
+      if (editingId !== null) {
+        res = await fetch(`/api/products/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include',
+        });
+      } else {
+        res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include',
+        });
+      }
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Erro ao salvar produto');
+      await fetchProducts();
+      setIsFormOpen(false);
+      toast.success(editingId ? "Produto atualizado!" : "Produto criado com sucesso!");
+    } catch (err: any) {
+      toast.error("Erro ao salvar: " + err.message);
+    } finally {
+      setIsSaving(false);
     }
   }
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
+  async function handleDelete(id: number) {
+    try {
+      const res = await fetch(`/api/products/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erro ao excluir');
+      }
+      await fetchProducts();
+      setDeletingId(null);
+      toast.success("Produto excluído.");
+    } catch (err: any) {
+      toast.error("Erro ao excluir: " + err.message);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -638,7 +690,7 @@ export default function AdminProducts() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => deletingId !== null && deleteMutation.mutate({ id: deletingId })}
+              onClick={() => deletingId !== null && handleDelete(deletingId)}
             >
               Excluir
             </AlertDialogAction>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
@@ -9,21 +8,31 @@ export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [, navigate] = useLocation();
 
-  const loginMutation = trpc.admin.login.useMutation({
-    onSuccess: () => {
-      navigate('/admin');
-    },
-    onError: (err) => {
-      setError(err.message || 'Credenciais inválidas. Tente novamente.');
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    loginMutation.mutate({ email, password });
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Credenciais inválidas. Tente novamente.');
+      } else {
+        navigate('/admin');
+      }
+    } catch {
+      setError('Erro de conexão. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,9 +95,9 @@ export default function AdminLogin() {
             <Button
               type="submit"
               className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-              disabled={loginMutation.isPending}
+              disabled={isLoading}
             >
-              {loginMutation.isPending ? (
+              {isLoading ? (
                 <><Loader2 size={16} className="animate-spin mr-2" /> Entrando...</>
               ) : (
                 'Entrar no Painel'

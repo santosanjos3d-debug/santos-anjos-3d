@@ -3,10 +3,9 @@
  * Design: Minimalismo Sagrado - Grid responsivo de produtos com espaçamento generoso
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import ProductModal from './ProductModal';
-import { trpc } from '@/lib/trpc';
 
 interface ProductColor {
   name: string;
@@ -306,25 +305,33 @@ export default function Catalog() {
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Carregar produtos do banco de dados
-  const { data: dbProducts, isLoading } = trpc.products.list.useQuery();
+  const [dbProducts, setDbProducts] = useState<Product[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Converter produtos do banco para o formato do componente
+  useEffect(() => {
+    fetch('/api/products')
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDbProducts(data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            category: p.category || '',
+            image: p.image || '',
+            description: p.description || '',
+            details: p.details || '',
+            price: p.price || '0',
+            sizes: Array.isArray(p.sizes) ? p.sizes : (p.sizes ? JSON.parse(p.sizes) : undefined),
+            colors: Array.isArray(p.colors) ? p.colors : (p.colors ? JSON.parse(p.colors) : undefined),
+          })));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const products: Product[] = dbProducts && dbProducts.length > 0
     ? dbProducts
-        .filter((p) => p.active !== 0)
-        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          category: p.category || '',
-          image: p.image || '',
-          description: p.description || '',
-          details: p.details || '',
-          price: p.price || '0',
-          sizes: p.sizes ? JSON.parse(p.sizes) : undefined,
-          colors: p.colors ? JSON.parse(p.colors) : undefined,
-        }))
     : PRODUCTS_FALLBACK;
 
   const handleProductClick = (product: Product) => {

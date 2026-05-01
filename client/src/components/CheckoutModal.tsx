@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -68,7 +67,7 @@ export default function CheckoutModal({
 
   const totalPrice = subtotal + shippingCost;
 
-  const createOrderMutation = trpc.orders.createFull.useMutation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Buscar endereço pelo CEP ao abrir (já temos o CEP do carrinho)
   const fetchAddress = async (postalCode: string) => {
@@ -99,6 +98,7 @@ export default function CheckoutModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const itemsSummary = cart.map(item => ({
         name: item.productName,
@@ -108,31 +108,40 @@ export default function CheckoutModal({
         price: item.price,
       }));
 
-      const result = await createOrderMutation.mutateAsync({
-        customerName,
-        customerPhone,
-        customerDocument: customerDocument,
-        addressPostalCode: cep.replace(/\D/g, ''),
-        addressStreet: street,
-        addressNumber: number,
-        addressComplement: complement || undefined,
-        addressDistrict: district,
-        addressCity: city,
-        addressState: state,
-        shippingServiceId: typeof shippingService?.id === 'number' ? shippingService.id : undefined,
-        shippingServiceName: shippingService?.name || 'Retirada no Local',
-        shippingCompany: shippingService?.company || '',
-        subtotal: subtotal.toFixed(2),
-        shippingCost: shippingCost.toFixed(2),
-        totalPrice: totalPrice.toFixed(2),
-        itemsSummary: JSON.stringify(itemsSummary),
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName,
+          customerPhone,
+          customerDocument,
+          addressPostalCode: cep.replace(/\D/g, ''),
+          addressStreet: street,
+          addressNumber: number,
+          addressComplement: complement || undefined,
+          addressDistrict: district,
+          addressCity: city,
+          addressState: state,
+          shippingServiceId: typeof shippingService?.id === 'number' ? shippingService.id : undefined,
+          shippingServiceName: shippingService?.name || 'Retirada no Local',
+          shippingCompany: shippingService?.company || '',
+          subtotal: subtotal.toFixed(2),
+          shippingCost: shippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
+          itemsSummary: JSON.stringify(itemsSummary),
+        }),
       });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Erro ao criar pedido');
 
       setOrderNumber(result.orderNumber);
       setStep('confirm');
     } catch (err) {
       console.error('Erro ao criar pedido:', err);
       alert('Erro ao registrar pedido. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -265,9 +274,9 @@ export default function CheckoutModal({
               <Button
                 type="submit"
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                disabled={createOrderMutation.isPending}
+                disabled={isSubmitting}
               >
-                {createOrderMutation.isPending ? (
+                {isSubmitting ? (
                   <><Loader2 size={16} className="animate-spin mr-2" /> Registrando Pedido...</>
                 ) : (
                   'Confirmar Pedido'
