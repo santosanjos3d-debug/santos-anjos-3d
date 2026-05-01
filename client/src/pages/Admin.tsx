@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Loader2, LogOut, Package, Tag, ExternalLink, RefreshCw,
+  Loader2, LogOut, Package, Tag, ExternalLink, RefreshCw, ShoppingBag,
   MapPin, Phone, User, Truck, CheckCircle2, Clock, XCircle, AlertCircle, Trash2
 } from 'lucide-react';
 import { useLocation } from 'wouter';
@@ -120,6 +120,9 @@ export default function Admin() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/products')} className="flex items-center gap-1">
+              <ShoppingBag size={14} /> Produtos
+            </Button>
             <span className="text-sm text-gray-600 hidden sm:block">Administrador</span>
             <Button variant="outline" size="sm" onClick={() => adminLogoutMutation.mutate()} className="flex items-center gap-1">
               <LogOut size={14} /> Sair

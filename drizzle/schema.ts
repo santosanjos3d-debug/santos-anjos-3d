@@ -20,14 +20,39 @@ export type InsertUser = typeof users.$inferInsert;
 
 /**
  * Produtos disponíveis para venda
+ * Inclui dimensões e peso para cálculo de frete, variações de tamanho e cor
  */
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  image: varchar("image", { length: 512 }),
+  details: text("details"),
   category: varchar("category", { length: 100 }),
+
+  // Imagem principal
+  image: varchar("image", { length: 512 }),
+
+  // Preço base (menor tamanho)
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+
+  // Dimensões para cálculo de frete (em cm)
+  widthCm: decimal("widthCm", { precision: 6, scale: 2 }),
+  heightCm: decimal("heightCm", { precision: 6, scale: 2 }),
+  lengthCm: decimal("lengthCm", { precision: 6, scale: 2 }),
+
+  // Peso para cálculo de frete (em gramas)
+  weightGrams: int("weightGrams"),
+
+  // Variações de tamanho e cor em JSON
+  // sizes: [{size: 'P', label: 'Pequeno (144mm)', price: '39.47'}]
+  sizes: text("sizes"),
+  // colors: [{name: 'Branco', value: 'white', image: '/images/...'}]
+  colors: text("colors"),
+
+  // Controle
+  active: int("active").default(1).notNull(), // 1=ativo, 0=inativo
+  sortOrder: int("sortOrder").default(0),
+
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

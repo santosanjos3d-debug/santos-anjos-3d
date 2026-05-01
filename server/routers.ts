@@ -24,6 +24,9 @@ function getAdminCookie(req: any): string | undefined {
 import {
   getAllProducts,
   getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
   createOrder,
   getOrderByNumber,
   getOrderById,
@@ -130,6 +133,101 @@ export const appRouter = router({
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(({ input }) => getProductById(input.id)),
+
+    /**
+     * Criar novo produto (admin)
+     */
+    create: publicProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+        details: z.string().optional(),
+        category: z.string().optional(),
+        image: z.string().optional(),
+        price: z.string(),
+        widthCm: z.string().optional(),
+        heightCm: z.string().optional(),
+        lengthCm: z.string().optional(),
+        weightGrams: z.number().optional(),
+        sizes: z.string().optional(), // JSON string
+        colors: z.string().optional(), // JSON string
+        active: z.number().default(1),
+        sortOrder: z.number().default(0),
+      }))
+      .mutation(async ({ input }) => {
+        await createProduct({
+          name: input.name,
+          description: input.description || null,
+          details: input.details || null,
+          category: input.category || null,
+          image: input.image || null,
+          price: input.price as any,
+          widthCm: input.widthCm as any || null,
+          heightCm: input.heightCm as any || null,
+          lengthCm: input.lengthCm as any || null,
+          weightGrams: input.weightGrams || null,
+          sizes: input.sizes || null,
+          colors: input.colors || null,
+          active: input.active,
+          sortOrder: input.sortOrder,
+        });
+        return { success: true };
+      }),
+
+    /**
+     * Atualizar produto (admin)
+     */
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        description: z.string().optional(),
+        details: z.string().optional(),
+        category: z.string().optional(),
+        image: z.string().optional(),
+        price: z.string().optional(),
+        widthCm: z.string().optional(),
+        heightCm: z.string().optional(),
+        lengthCm: z.string().optional(),
+        weightGrams: z.number().optional(),
+        sizes: z.string().optional(),
+        colors: z.string().optional(),
+        active: z.number().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateProduct(id, data as any);
+        return { success: true };
+      }),
+
+    /**
+     * Deletar produto (admin)
+     */
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteProduct(input.id);
+        return { success: true };
+      }),
+
+    /**
+     * Upload de imagem de produto via S3
+     */
+    uploadImage: publicProcedure
+      .input(z.object({
+        filename: z.string(),
+        contentType: z.string(),
+        base64Data: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { storagePut } = await import('./storage');
+        const buffer = Buffer.from(input.base64Data, 'base64');
+        const ext = input.filename.split('.').pop() || 'jpg';
+        const key = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { url } = await storagePut(key, buffer, input.contentType);
+        return { url };
+      }),
   }),
 
   shipping: router({

@@ -69,6 +69,24 @@ export async function getProductById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function createProduct(data: InsertProduct) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.insert(products).values(data);
+}
+
+export async function updateProduct(id: number, data: Partial<InsertProduct>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.update(products).set({ ...data, updatedAt: new Date() } as any).where(eq(products.id, id));
+}
+
+export async function deleteProduct(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.delete(products).where(eq(products.id, id));
+}
+
 // ─── Orders ──────────────────────────────────────────────────────────────────
 
 export async function createOrder(order: InsertOrder) {

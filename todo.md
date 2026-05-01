@@ -230,3 +230,13 @@
 - [x] Problema: MELHOR_ENVIO_DOCUMENT tinha valor antigo 05526634900 (inválido)
 - [x] Corrigido: atualizado secret para 05526634922 via webdev_request_secrets
 - [x] Salvar checkpoint (17 testes passando)
+
+## Feature: Gestão de Produtos no Admin (CRUD)
+- [x] Analisar estrutura atual dos produtos no Catalog.tsx (15 produtos hardcoded)
+- [x] Expandir tabela `products` no banco com dimensões, peso, tamanhos, cores, sortOrder, active
+- [x] Migrar 14 produtos do Catalog.tsx para o banco de dados
+- [x] Criar procedures tRPC: products.list, create, update, delete, uploadImage
+- [x] Criar página AdminProducts com formulário completo (imagem, preço, dimensões, peso, tamanhos, cores)
+- [x] Adicionar botão 'Produtos' no cabeçalho do Admin e rota /admin/products
+- [x] Atualizar Catálogo para carregar produtos dinamicamente do banco
+- [x] Testar fluxo completo (17 testes passando) e salvar checkpoint
