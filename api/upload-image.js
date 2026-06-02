@@ -1,19 +1,4 @@
-// Vercel Serverless Function - Upload de imagem para S3
-import { cors } from './_lib/db.js';
-import { requireAdmin } from './_lib/auth.js';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-
-const s3 = new S3Client({
-  region: process.env.S3_REGION || 'us-east-1',
-  endpoint: process.env.S3_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  },
-  forcePathStyle: true,
-});
-
-const BUCKET = process.env.S3_BUCKET || '';
+import { put } from '@vercel/blob';
 
 export const config = {
   api: {
@@ -24,42 +9,40 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  cors(res);
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const ok = await requireAdmin(req, res);
-  if (!ok) return;
-
   try {
-    // Aceitar tanto fileName/fileData quanto filename/base64Data (compatibilidade)
-    const fileName = req.body?.fileName || req.body?.filename;
-    const fileData = req.body?.fileData || req.body?.base64Data;
-    const contentType = req.body?.contentType;
-
-    if (!fileName || !fileData) {
-      return res.status(400).json({ error: 'fileName/filename e fileData/base64Data são obrigatórios' });
+    if (req.method !== 'POST') {
+      return res.status(405).json({
+        error: 'Method not allowed',
+      });
     }
 
-    // fileData deve ser base64
-    const buffer = Buffer.from(fileData, 'base64');
-    const suffix = Math.random().toString(36).substring(2, 8);
-    const ext = fileName.split('.').pop() || 'jpg';
-    const key = `products/${Date.now()}-${suffix}.${ext}`;
+    const { filename, content } = req.body;
 
-    await s3.send(new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType || 'image/jpeg',
-    }));
+    if (!filename || !content) {
+      return res.status(400).json({
+        error: 'Missing filename or content',
+      });
+    }
 
-    const endpoint = process.env.S3_ENDPOINT || `https://${BUCKET}.s3.amazonaws.com`;
-    const url = `${endpoint}/${key}`;
+    // Converter base64 para buffer
+    const base64Data = content.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
 
-    return res.status(200).json({ url, key });
-  } catch (err) {
-    console.error('[Upload Image]', err);
-    return res.status(500).json({ error: 'Erro ao fazer upload da imagem' });
+    // Upload para Vercel Blob
+    const blob = await put(filename, buffer, {
+      access: 'public',
+    });
+
+    return res.status(200).json({
+      success: true,
+      url: blob.url,
+    });
+
+  } catch (error) {
+    console.error('[Upload Image]', error);
+
+    return res.status(500).json({
+      error: error.message,
+    });
   }
 }
