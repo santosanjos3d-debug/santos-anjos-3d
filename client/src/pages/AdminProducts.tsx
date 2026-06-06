@@ -46,6 +46,17 @@ type ProductForm = {
   sortOrder: string;
 };
 
+async function parseJsonResponse(res: Response) {
+  const text = await res.text();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Resposta inválida do servidor (${res.status})`);
+  }
+}
+
 const EMPTY_FORM: ProductForm = {
   name: "",
   description: "",
@@ -145,8 +156,8 @@ export default function AdminProducts() {
           }),
           credentials: 'include',
         });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.error || 'Erro no upload');
+        const result = await parseJsonResponse(res);
+        if (!res.ok) throw new Error(result?.error || 'Erro no upload');
         onUrl(result.url);
       } catch (err: any) {
         toast.error("Erro no upload: " + err.message);
@@ -224,8 +235,8 @@ export default function AdminProducts() {
       heightCm: form.heightCm || undefined,
       lengthCm: form.lengthCm || undefined,
       weightGrams: form.weightGrams ? parseInt(form.weightGrams) : undefined,
-      sizes: form.sizes.length > 0 ? JSON.stringify(form.sizes) : undefined,
-      colors: form.colors.length > 0 ? JSON.stringify(form.colors) : undefined,
+      sizes: form.sizes.length > 0 ? form.sizes : undefined,
+      colors: form.colors.length > 0 ? form.colors : undefined,
       active: form.active,
       sortOrder: parseInt(form.sortOrder) || 0,
     };
@@ -233,7 +244,7 @@ export default function AdminProducts() {
     try {
       let res: Response;
       if (editingId !== null) {
-        res = await fetch(`/api/products/${editingId}`, {
+        res = await fetch(`/api/products?id=${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -247,8 +258,8 @@ export default function AdminProducts() {
           credentials: 'include',
         });
       }
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Erro ao salvar produto');
+      const result = await parseJsonResponse(res);
+      if (!res.ok) throw new Error(result?.error || 'Erro ao salvar produto');
       await fetchProducts();
       setIsFormOpen(false);
       toast.success(editingId ? "Produto atualizado!" : "Produto criado com sucesso!");
@@ -261,13 +272,13 @@ export default function AdminProducts() {
 
   async function handleDelete(id: number) {
     try {
-      const res = await fetch(`/api/products/${id}`, {
+      const res = await fetch(`/api/products?id=${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao excluir');
+        const data = await parseJsonResponse(res);
+        throw new Error(data?.error || 'Erro ao excluir');
       }
       await fetchProducts();
       setDeletingId(null);
