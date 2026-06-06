@@ -1,6 +1,15 @@
-// Vercel Serverless Function - Products CRUD
 import { query, cors } from './_lib/db.js';
 import { requireAdmin } from './_lib/auth.js';
+
+function normalizeJsonField(value) {
+  if (value === undefined || value === null || value === '') return null;
+  return typeof value === 'string' ? value : JSON.stringify(value);
+}
+
+function getProductId(req) {
+  const raw = req.query?.id;
+  return Array.isArray(raw) ? raw[0] : raw;
+}
 
 export default async function handler(req, res) {
   cors(res);
@@ -61,8 +70,8 @@ export default async function handler(req, res) {
           heightCm || null,
           lengthCm || null,
           weightGrams || null,
-          sizes ? JSON.stringify(sizes) : null,
-          colors ? JSON.stringify(colors) : null,
+          normalizeJsonField(sizes),
+          normalizeJsonField(colors),
           sortOrder || 0
         ]
       );
@@ -71,6 +80,85 @@ export default async function handler(req, res) {
     } catch (err) {
       console.error('[Products POST]', err);
       return res.status(500).json({ error: 'Erro ao criar produto' });
+    }
+  }
+
+  // PUT - atualizar produto (admin)
+  if (req.method === 'PUT') {
+    const ok = await requireAdmin(req, res);
+    if (!ok) return;
+
+    const id = getProductId(req);
+    if (!id) {
+      return res.status(400).json({ error: 'ID do produto é obrigatório' });
+    }
+
+    try {
+      const {
+        name, description, details, category, image, price,
+        widthCm, heightCm, lengthCm, weightGrams, sizes, colors, active, sortOrder
+      } = req.body || {};
+
+      await query(
+        `UPDATE products SET
+          name = COALESCE(?, name),
+          description = ?,
+          details = ?,
+          category = ?,
+          image = COALESCE(?, image),
+          price = COALESCE(?, price),
+          widthCm = ?,
+          heightCm = ?,
+          lengthCm = ?,
+          weightGrams = ?,
+          sizes = ?,
+          colors = ?,
+          active = COALESCE(?, active),
+          sortOrder = COALESCE(?, sortOrder),
+          updatedAt = NOW()
+         WHERE id = ?`,
+        [
+          name || null,
+          description || null,
+          details || null,
+          category || null,
+          image || null,
+          price || null,
+          widthCm || null,
+          heightCm || null,
+          lengthCm || null,
+          weightGrams || null,
+          normalizeJsonField(sizes),
+          normalizeJsonField(colors),
+          active !== undefined ? (active ? 1 : 0) : null,
+          sortOrder !== undefined ? sortOrder : null,
+          id
+        ]
+      );
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error('[Products PUT]', err);
+      return res.status(500).json({ error: 'Erro ao atualizar produto' });
+    }
+  }
+
+  // DELETE - excluir produto (admin)
+  if (req.method === 'DELETE') {
+    const ok = await requireAdmin(req, res);
+    if (!ok) return;
+
+    const id = getProductId(req);
+    if (!id) {
+      return res.status(400).json({ error: 'ID do produto é obrigatório' });
+    }
+
+    try {
+      await query('DELETE FROM products WHERE id = ?', [id]);
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error('[Products DELETE]', err);
+      return res.status(500).json({ error: 'Erro ao excluir produto' });
     }
   }
 
