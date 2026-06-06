@@ -11,7 +11,7 @@ export default function About() {
           {/* Left: Image */}
           <div className="rounded-lg overflow-hidden shadow-lg">
             <img
-              src="/images/angels-collection.jpg"
+              src="https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/angels-collection-YyIjpjFfL4QwWQXzGcsJHqxfh3drU9.jpg"
               alt="Coleção de Santos 3D"
               className="w-full h-auto object-cover"
             />

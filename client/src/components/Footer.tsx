@@ -17,7 +17,7 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <img 
-                src="/images/logo-simplified.png" 
+                src="https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/logo-simplified-u8oZdUZkuko3bNg1R9lUHFn1RVGkZP.png" 
                 alt="Santos Anjos 3D Logo" 
                 className="w-10 h-10 flex-shrink-0 invert"
               />

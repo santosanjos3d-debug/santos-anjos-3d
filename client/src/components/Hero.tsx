@@ -10,7 +10,7 @@ export default function Hero() {
       {/* Background image com overlay suave */}
       <div className="relative h-[600px] md:h-[700px] w-full flex items-center justify-center">
         <img
-          src="/images/hero-banner.jpg"
+          src="https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/hero-banner-dk90LdYaCkSa3AmoLjZHM5HZ7mCNBC.jpg"
           alt="Nossa Senhora - Impressão 3D"
           className="absolute inset-0 w-full h-full object-cover"
         />
