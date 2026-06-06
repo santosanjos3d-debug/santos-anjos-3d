@@ -191,11 +191,11 @@ export async function initializeProducts() {
   const existingProducts = await db.select().from(products);
   if (existingProducts.length > 0) return;
   const productsToInsert: InsertProduct[] = [
-    { name: "Nossa Senhora de Lourdes", description: "Estatueta de Nossa Senhora de Lourdes em resina branca com acabamento fino.", price: "150.00", image: "/images/nossa-senhora-lourdes.jpg" },
-    { name: "Sagrado Coração de Maria", description: "Representação do Sagrado Coração de Maria com detalhes delicados.", price: "150.00", image: "/images/sagrado-coracao-maria.jpg" },
-    { name: "Santa Hildegarda de Bingen", description: "Santa Hildegarda, mística e estudiosa, com livro em mãos.", price: "140.00", image: "/images/santa-hildegarda.jpg" },
-    { name: "São Francisco de Assis", description: "São Francisco em sua veste característica. Padroeiro da natureza e dos animais.", price: "140.00", image: "/images/sao-francisco.jpg" },
-    { name: "São José com Menino Jesus", description: "São José protetor com o Menino Jesus nos braços.", price: "160.00", image: "/images/sao-jose.jpg" },
+    { name: "Nossa Senhora de Lourdes", description: "Estatueta de Nossa Senhora de Lourdes em resina branca com acabamento fino.", price: "150.00", image: "https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/nossa-senhora-lourdes-olGpVTRzSgzBWRpHp6yXqz2Ft7GkeK.jpg" },
+    { name: "Sagrado Coração de Maria", description: "Representação do Sagrado Coração de Maria com detalhes delicados.", price: "150.00", image: "https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/sagrado-coracao-maria-8P0n84P36FmHzo38Pf4EuzDFieUvs8.jpg" },
+    { name: "Santa Hildegarda de Bingen", description: "Santa Hildegarda, mística e estudiosa, com livro em mãos.", price: "140.00", image: "https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/santa-hildegarda-jHqvWr3UKIcy8H3IGo5uD7POuaAmlV.jpg" },
+    { name: "São Francisco de Assis", description: "São Francisco em sua veste característica. Padroeiro da natureza e dos animais.", price: "140.00", image: "https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/sao-francisco-P3C4npnjrKLC5Zz8k75F4UoBgs67IT.jpg" },
+    { name: "São José com Menino Jesus", description: "São José protetor com o Menino Jesus nos braços.", price: "160.00", image: "https://puqvgwfdbcravfwe.public.blob.vercel-storage.com/santos-anjos-3d/images/sao-jose-LUC0gYsNyDqsYGpZ0vLH1Vx3Sm6BBv.jpg" },
   ];
   try {
     await db.insert(products).values(productsToInsert);
