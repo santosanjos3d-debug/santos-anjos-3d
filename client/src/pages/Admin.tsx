@@ -33,7 +33,7 @@ export default function Admin() {
 
   // Verificar autenticação
   useEffect(() => {
-    fetch('/api/admin-check', { credentials: 'include' })
+    fetch('/api/admin?action=check', { credentials: 'include' })
       .then(r => r.json())
       .then(data => {
         if (data.authenticated) {
@@ -74,7 +74,7 @@ export default function Admin() {
   }, [isAuthenticated, fetchOrders]);
 
   const handleLogout = async () => {
-    await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
+    await fetch('/api/admin?action=logout', { method: 'POST', credentials: 'include' });
     navigate('/admin/login');
   };
 
