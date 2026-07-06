@@ -2,6 +2,7 @@
 import mysql from 'mysql2/promise';
 
 let pool = null;
+let migrationRun = false;
 
 export function getDb() {
   if (!pool) {
@@ -19,6 +20,38 @@ export async function query(sql, params = []) {
   const db = getDb();
   const [rows] = await db.execute(sql, params);
   return rows;
+}
+
+// Migration automática: adiciona colunas de pagamento se não existirem
+export async function runMigration() {
+  if (migrationRun) return;
+  migrationRun = true;
+
+  const db = getDb();
+
+  const migrations = [
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS paymentMethod ENUM('pix', 'card') DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS paymentId VARCHAR(255) DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS paymentStatus ENUM('pending', 'approved', 'rejected', 'expired', 'refunded') DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS pixQrCodeBase64 TEXT DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS pixCopyPaste TEXT DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS cardBrand VARCHAR(32) DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS cardInstallments INT DEFAULT NULL`,
+    `ALTER TABLE orders ADD COLUMN IF NOT EXISTS mercadopagoPaymentId VARCHAR(255) DEFAULT NULL`,
+  ];
+
+  for (const sql of migrations) {
+    try {
+      await db.execute(sql);
+    } catch (err) {
+      // Ignorar erro se coluna já existe (alteração de tabela)
+      if (!err.message?.includes('Duplicate column')) {
+        console.warn('[Migration] Warning:', err.message);
+      }
+    }
+  }
+
+  console.log('[Migration] Payment columns migration completed');
 }
 
 export function cors(res) {

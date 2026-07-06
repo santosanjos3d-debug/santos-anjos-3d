@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, CheckCircle2, Package, MapPin, User, Phone } from 'lucide-react';
+import PaymentStep from './PaymentStep';
 
 interface CartItem {
   id: string;
@@ -48,8 +49,9 @@ export default function CheckoutModal({
   onClose,
   onSuccess,
 }: CheckoutModalProps) {
-  const [step, setStep] = useState<'address' | 'confirm' | 'success'>('address');
+  const [step, setStep] = useState<'address' | 'payment' | 'success'>('address');
   const [orderNumber, setOrderNumber] = useState('');
+  const [orderId, setOrderId] = useState('');
   const [loadingCep, setLoadingCep] = useState(false);
 
   // Dados do cliente
@@ -136,7 +138,8 @@ export default function CheckoutModal({
       if (!res.ok) throw new Error(result.error || 'Erro ao criar pedido');
 
       setOrderNumber(result.orderNumber);
-      setStep('confirm');
+      setOrderId(result.id?.toString() || result.orderNumber);
+      setStep('payment');
     } catch (err) {
       console.error('Erro ao criar pedido:', err);
       alert('Erro ao registrar pedido. Tente novamente.');
@@ -145,30 +148,12 @@ export default function CheckoutModal({
     }
   };
 
-  const handleWhatsApp = () => {
-    const itemsText = cart
-      .map(i => `• ${i.productName} (${i.color}, ${i.sizeLabel}) x${i.quantity} — ${i.price}`)
-      .join('\n');
-
-    const shippingText = shippingService?.id === 'retirada-local'
-      ? 'Retirada no Local (R$ 0,00)'
-      : `${shippingService?.company} ${shippingService?.name} — R$ ${shippingCost.toFixed(2).replace('.', ',')}`;
-
-    const msg =
-      `🛍️ *Novo Pedido Santos Anjos 3D*\n` +
-      `Pedido: *${orderNumber}*\n\n` +
-      `*Itens:*\n${itemsText}\n\n` +
-      `*Entrega:* ${shippingText}\n` +
-      `*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n` +
-      `*Total:* R$ ${totalPrice.toFixed(2).replace('.', ',')}\n\n` +
-      `*Endereço de entrega:*\n` +
-      `${street}, ${number}${complement ? ` - ${complement}` : ''}\n` +
-      `${district} — ${city}/${state}\n` +
-      `CEP: ${cep}\n\n` +
-      `Aguardo informações para pagamento via PIX. Obrigado! 🙏`;
-
-    window.open(`https://wa.me/5547996641959?text=${encodeURIComponent(msg)}`, '_blank');
+  const handlePaymentSuccess = () => {
     setStep('success');
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error('Erro no pagamento:', error);
   };
 
   return (
@@ -279,49 +264,36 @@ export default function CheckoutModal({
                 {isSubmitting ? (
                   <><Loader2 size={16} className="animate-spin mr-2" /> Registrando Pedido...</>
                 ) : (
-                  'Confirmar Pedido'
+                  'Continuar para Pagamento'
                 )}
               </Button>
             </form>
           </>
         )}
 
-        {/* STEP: Confirmação / WhatsApp */}
-        {step === 'confirm' && (
+        {/* STEP: Pagamento */}
+        {step === 'payment' && (
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CheckCircle2 size={20} className="text-green-600" />
-                Pedido Registrado!
+                Pagamento — Pedido {orderNumber}
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-2">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                <p className="text-sm text-green-700">Número do Pedido</p>
-                <p className="text-2xl font-bold text-green-800">{orderNumber}</p>
-                <p className="text-lg font-semibold text-green-700 mt-1">
-                  Total: R$ {totalPrice.toFixed(2).replace('.', ',')}
-                </p>
-              </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800 space-y-2">
-                <p className="font-semibold">📋 Próximos passos:</p>
-                <p>1. Clique em <strong>"Enviar pelo WhatsApp"</strong> para confirmar seu pedido</p>
-                <p>2. Você receberá a chave PIX para pagamento</p>
-                <p>3. Após confirmação do pagamento, a etiqueta de envio será gerada automaticamente</p>
-                <p>4. Você receberá o código de rastreio pelo WhatsApp</p>
-              </div>
-
-              <Button
-                onClick={handleWhatsApp}
-                className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-3"
-              >
-                📱 Enviar pelo WhatsApp
-              </Button>
-              <Button onClick={onClose} variant="outline" className="w-full">
-                Fechar
-              </Button>
+            <div className="mt-4">
+              <PaymentStep
+                orderId={orderId}
+                orderNumber={orderNumber}
+                totalAmount={totalPrice}
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+              />
             </div>
+
+            <Button onClick={onClose} variant="outline" className="w-full mt-4">
+              Cancelar
+            </Button>
           </>
         )}
 
@@ -329,14 +301,14 @@ export default function CheckoutModal({
         {step === 'success' && (
           <>
             <DialogHeader>
-              <DialogTitle>Pedido Enviado!</DialogTitle>
+              <DialogTitle>Pagamento Confirmado!</DialogTitle>
             </DialogHeader>
             <div className="text-center space-y-4 mt-2">
               <CheckCircle2 size={56} className="mx-auto text-green-600" />
               <p className="text-lg font-semibold">Obrigado pela sua compra!</p>
               <p className="text-sm text-gray-600">
-                Pedido <strong>{orderNumber}</strong> registrado com sucesso.<br />
-                Em breve entraremos em contato pelo WhatsApp.
+                Pedido <strong>{orderNumber}</strong> pago com sucesso.<br />
+                Em breve prepararemos seu envio!
               </p>
               <Button onClick={() => { onSuccess(); onClose(); }} className="w-full bg-amber-600 hover:bg-amber-700">
                 Fechar

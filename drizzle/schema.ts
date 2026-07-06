@@ -101,6 +101,16 @@ export const orders = mysqlTable("orders", {
   // Resumo dos itens (JSON serializado)
   itemsSummary: text("itemsSummary"), // JSON: [{name, size, color, qty, price}]
 
+  // Pagamento
+  paymentMethod: mysqlEnum("paymentMethod", ["pix", "card"]),
+  paymentId: varchar("paymentId", { length: 255 }),
+  paymentStatus: mysqlEnum("paymentStatus", ["pending", "approved", "rejected", "expired", "refunded"]),
+  pixQrCodeBase64: text("pixQrCodeBase64"),
+  pixCopyPaste: text("pixCopyPaste"),
+  cardBrand: varchar("cardBrand", { length: 32 }),
+  cardInstallments: int("cardInstallments"),
+  mercadopagoPaymentId: varchar("mercadopagoPaymentId", { length: 255 }),
+
   // Status do pedido
   status: mysqlEnum("status", ["pending", "paid", "processing", "shipped", "completed", "cancelled"]).default("pending").notNull(),
 

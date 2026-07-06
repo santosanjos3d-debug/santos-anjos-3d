@@ -1,5 +1,5 @@
 // Vercel Serverless Function - Orders CRUD
-import { query, cors } from './_lib/db.js';
+import { query, cors, runMigration } from './_lib/db.js';
 import { requireAdmin } from './_lib/auth.js';
 
 function generateOrderNumber() {
@@ -18,6 +18,9 @@ export default async function handler(req, res) {
   // POST - criar pedido (público)
   if (req.method === 'POST') {
     try {
+      // Executar migration automática
+      await runMigration();
+
       const {
         customerName, customerPhone, customerDocument,
         addressPostalCode, addressStreet, addressNumber, addressComplement,
@@ -32,21 +35,27 @@ export default async function handler(req, res) {
 
       const orderNumber = generateOrderNumber();
 
+      const {
+        paymentMethod, cardInstallments
+      } = req.body || {};
+
       const result = await query(
         `INSERT INTO orders (
           orderNumber, customerName, customerPhone, customerDocument,
           addressPostalCode, addressStreet, addressNumber, addressComplement,
           addressDistrict, addressCity, addressState,
           shippingServiceId, shippingServiceName, shippingCompany,
-          subtotal, shippingCost, totalPrice, itemsSummary, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+          subtotal, shippingCost, totalPrice, itemsSummary,
+          paymentMethod, cardInstallments, paymentStatus, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending')`,
         [
           orderNumber, customerName, customerPhone, customerDocument,
           addressPostalCode, addressStreet || null, addressNumber || null, addressComplement || null,
           addressDistrict || null, addressCity || null, addressState || null,
           shippingServiceId || null, shippingServiceName || null, shippingCompany || null,
           subtotal || 0, shippingCost || 0, totalPrice || 0,
-          itemsSummary ? JSON.stringify(itemsSummary) : null
+          itemsSummary ? JSON.stringify(itemsSummary) : null,
+          paymentMethod || null, cardInstallments || null
         ]
       );
 
