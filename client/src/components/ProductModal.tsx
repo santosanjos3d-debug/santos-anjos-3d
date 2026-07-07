@@ -161,7 +161,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{displayLabel}</p>
-                <p className="text-3xl font-bold text-accent">R$ {displayPrice}</p>
+                <p className="text-3xl font-bold text-accent">R$ {displayPrice.replace('.', ',')}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Cor: {currentColor?.name || 'Padrão'}</p>
