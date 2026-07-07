@@ -158,7 +158,7 @@ export default function PaymentStep({
 
       // Detect card brand from number
       let paymentMethodId = 'visa';
-      if (cardNumber.startsWith('5')) paymentMethodId = 'mastercard';
+      if (cardNumber.startsWith('5')) paymentMethodId = 'master';
       else if (cardNumber.startsWith('4')) paymentMethodId = 'visa';
       else if (cardNumber.startsWith('3')) paymentMethodId = 'amex';
       else if (cardNumber.startsWith('6')) paymentMethodId = 'elo';
