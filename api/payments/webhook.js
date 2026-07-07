@@ -1,24 +1,19 @@
 // Vercel Serverless Function - Webhook do Mercado Pago
-import { MercadoPagoConfig, Payment } from 'mercadopago';
-import { query, cors } from '../_lib/db.js';
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
-});
+import { query, cors, runMigration } from '../_lib/db.js';
 
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Mercado Pago envia POST para webhooks
   if (req.method !== 'POST') {
     return res.status(200).json({ received: true });
   }
 
   try {
+    await runMigration();
+
     const { action, data } = req.body || {};
 
-    // Mercado Pago envia: { action: "payment.created", data: { id: "123456" } }
     if (action === 'payment.created' || action === 'payment.updated') {
       const paymentId = data?.id;
 
@@ -27,11 +22,11 @@ export default async function handler(req, res) {
         return res.status(200).json({ received: true });
       }
 
-      // Buscar detalhes do pagamento no Mercado Pago
-      const payment = new Payment(client);
-      const paymentDetails = await payment.get({ id: paymentId });
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
+      });
+      const paymentDetails = await response.json();
 
-      // Encontrar pedido pelo external_reference (orderId)
       const orderId = paymentDetails.external_reference;
       if (!orderId) {
         console.error('[Webhook] No external_reference in payment');
@@ -46,7 +41,6 @@ export default async function handler(req, res) {
 
       const order = orders[0];
 
-      // Mapear status do Mercado Pago para nosso sistema
       const statusMap = {
         'approved': 'paid',
         'pending': 'pending',
@@ -62,7 +56,6 @@ export default async function handler(req, res) {
       const newOrderStatus = statusMap[paymentDetails.status] || order.status;
       const newPaymentStatus = paymentDetails.status;
 
-      // Atualizar pedido
       await query(
         `UPDATE orders SET
           paymentStatus = ?,
@@ -82,11 +75,9 @@ export default async function handler(req, res) {
       console.log(`[Webhook] Order ${order.orderNumber} updated: payment=${newPaymentStatus}, order=${newOrderStatus}`);
     }
 
-    // Sempre retornar 200 para o Mercado Pago não reenviar
     return res.status(200).json({ received: true });
   } catch (err) {
     console.error('[Webhook Error]', err);
-    // Mesmo com erro, retornar 200 para evitar retry infinito
     return res.status(200).json({ received: true, error: err.message });
   }
 }
