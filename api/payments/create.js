@@ -67,9 +67,21 @@ export default async function handler(req, res) {
       body: JSON.stringify(paymentData),
     }).then(r => r.json());
 
-    console.log('[Payments CREATE] MP response:', JSON.stringify({ id: result.id, status: result.status, error: result.error, hasPointOfInteraction: !!result.point_of_interaction, hasTxData: !!result.point_of_interaction?.transaction_data }));
+    console.log('[Payments CREATE] MP response:', JSON.stringify({ id: result.id, status: result.status, error: result.error, message: result.message, hasPointOfInteraction: !!result.point_of_interaction, hasTxData: !!result.point_of_interaction?.transaction_data, keys: Object.keys(result).join(',') }));
 
     if (result.id) {
+      // Se não veio point_of_interaction, buscar detalhes do pagamento
+      if (paymentMethod === 'pix' && !result.point_of_interaction?.transaction_data) {
+        console.log('[Payments CREATE] No POI in response, fetching payment details for id:', result.id);
+        const details = await fetch(`${MP_API}/${result.id}`, {
+          headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
+        }).then(r => r.json());
+        console.log('[Payments CREATE] Payment details:', JSON.stringify({ hasPOI: !!details.point_of_interaction, hasTxData: !!details.point_of_interaction?.transaction_data, status: details.status }));
+        if (details.point_of_interaction?.transaction_data) {
+          result.point_of_interaction = details.point_of_interaction;
+        }
+      }
+
       const updateFields = {
         paymentMethod,
         paymentStatus: result.status || 'pending',
@@ -104,7 +116,7 @@ export default async function handler(req, res) {
     }
 
     if (result.error) {
-      console.error('[Payments CREATE] MercadoPago error:', result);
+      console.error('[Payments CREATE] MercadoPago error:', JSON.stringify(result));
       return res.status(500).json({ error: result.message || 'Erro ao criar pagamento', details: result });
     }
 
@@ -114,10 +126,13 @@ export default async function handler(req, res) {
       paymentMethod,
     };
 
-    if (paymentMethod === 'pix' && result.point_of_interaction?.transaction_data) {
-      response.pixQrCode = result.point_of_interaction.transaction_data.qr_code_base64;
-      response.pixCopyPaste = result.point_of_interaction.transaction_data.qr_code;
-      response.pixExpiration = result.date_of_expiration;
+    if (paymentMethod === 'pix') {
+      const txData = result.point_of_interaction?.transaction_data;
+      if (txData) {
+        response.pixQrCode = txData.qr_code_base64;
+        response.pixCopyPaste = txData.qr_code;
+        response.pixExpiration = result.date_of_expiration;
+      }
     }
 
     return res.status(200).json(response);
