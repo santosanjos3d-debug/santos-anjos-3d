@@ -258,7 +258,7 @@ export default function PaymentStep({
               <div className="flex justify-center">
                 <div className="bg-white p-4 rounded-lg border-2 border-green-200">
                   <img
-                    src={`data:image/png;base64,${pixData.qrCode}`}
+                    src={pixData.qrCode?.startsWith('data:') ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                     alt="QR Code PIX"
                     className="w-48 h-48"
                   />

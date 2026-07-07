@@ -67,6 +67,8 @@ export default async function handler(req, res) {
       body: JSON.stringify(paymentData),
     }).then(r => r.json());
 
+    console.log('[Payments CREATE] MP response:', JSON.stringify({ id: result.id, status: result.status, error: result.error, hasPointOfInteraction: !!result.point_of_interaction, hasTxData: !!result.point_of_interaction?.transaction_data }));
+
     if (result.id) {
       const updateFields = {
         paymentMethod,
