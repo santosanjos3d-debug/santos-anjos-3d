@@ -28,6 +28,7 @@ export default async function handler(req, res) {
       description: `Pedido ${order.orderNumber} - Santos Anjos 3D`,
       external_reference: String(order.id),
       notification_url: `${getBaseUrl(req)}/api/payments/webhook`,
+      date_of_expiration: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     };
 
     if (paymentMethod === 'pix') {
@@ -39,6 +40,14 @@ export default async function handler(req, res) {
         identification: {
           type: 'CPF',
           number: order.customerDocument?.replace(/\D/g, '') || '00000000000',
+        },
+        address: {
+          zip_code: order.addressPostalCode || '00000000',
+          street_name: order.addressStreet || 'Rua não informada',
+          street_number: order.addressNumber || '0',
+          neighborhood: order.addressDistrict || '',
+          city: order.addressCity || '',
+          federal_unit: order.addressState || '',
         },
       };
     } else if (paymentMethod === 'card') {
