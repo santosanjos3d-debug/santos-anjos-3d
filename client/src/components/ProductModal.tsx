@@ -169,27 +169,19 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
             </div>
           </div>
 
-          {/* Add to Cart and WhatsApp CTA */}
-          <div className="border-t border-border/50 pt-6 space-y-3">
+          {/* Add to Cart */}
+          <div className="border-t border-border/50 pt-6">
             <button
               onClick={handleAddToCart}
               className={`w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
                 addedToCart
                   ? 'bg-green-500 text-white'
-                  : 'bg-secondary text-foreground hover:bg-secondary/80'
+                  : 'bg-accent text-background hover:bg-accent/90'
               }`}
             >
               <ShoppingCart size={20} />
               {addedToCart ? 'Adicionado ao Carrinho!' : 'Adicionar ao Carrinho'}
             </button>
-            <a
-              href={`https://wa.me/5547996641959?text=Olá! Gostaria de encomendar: ${product.name} - Tamanho: ${displayLabel} - Cor: ${currentColor?.name || 'Padrão'} - Preço: R$ ${displayPrice}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full py-4 bg-accent text-background rounded-lg font-bold text-lg hover:bg-accent/90 transition-all duration-300 text-center hover:shadow-lg"
-            >
-              Encomendar via WhatsApp
-            </a>
           </div>
         </div>
       </div>
