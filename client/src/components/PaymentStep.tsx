@@ -151,6 +151,8 @@ export default function PaymentStep({
       });
 
       console.log('[CardToken] Token created:', JSON.stringify(cardToken));
+      console.log('[CardToken] Token keys:', Object.keys(cardToken));
+      console.log('[CardToken] payment_method:', JSON.stringify(cardToken.payment_method));
 
       if (!cardToken || !cardToken.id) {
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');

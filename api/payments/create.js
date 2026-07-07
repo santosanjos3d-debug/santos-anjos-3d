@@ -18,10 +18,11 @@ export default async function handler(req, res) {
       const result = await fetch(`https://api.mercadopago.com/v1/payment_methods/search?bin=${bin}`, {
         headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
       }).then(r => r.json());
-      console.log('[BIN Lookup] Result:', JSON.stringify(result));
+      console.log('[BIN Lookup] Full result:', JSON.stringify(result));
       if (result.results && result.results.length > 0) {
-        const method = result.results[0];
-        return res.status(200).json({ paymentMethodId: method.id, name: method.name, thumbnail: method.thumbnail });
+        const creditCard = result.results.find(m => m.payment_type_id === 'credit_card') || result.results[0];
+        console.log('[BIN Lookup] Selected:', creditCard.id, creditCard.payment_type_id, creditCard.name);
+        return res.status(200).json({ paymentMethodId: creditCard.id, name: creditCard.name, thumbnail: creditCard.thumbnail, paymentTypeId: creditCard.payment_type_id });
       }
       return res.status(404).json({ error: 'Bandeira não encontrada' });
     } catch (err) {
