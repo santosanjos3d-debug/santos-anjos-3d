@@ -63,6 +63,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+        'X-Idempotency-Key': `${orderId}-${Date.now()}`,
       },
       body: JSON.stringify(paymentData),
     }).then(r => r.json());
