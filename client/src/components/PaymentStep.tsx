@@ -157,7 +157,7 @@ export default function PaymentStep({
       }
 
       // Lookup card brand from BIN via backend
-      const binRes = await fetch('/api/payments/binlookup', {
+      const binRes = await fetch('/api/payments/create?action=binlookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bin: cardNumber.substring(0, 6) }),
