@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   try {
     await runMigration();
 
-    const { orderId, paymentMethod, cardToken, installments, identification } = req.body || {};
+    const { orderId, paymentMethod, cardToken, paymentMethodId, installments, identification } = req.body || {};
 
     if (!orderId || !paymentMethod) {
       return res.status(400).json({ error: 'orderId e paymentMethod são obrigatórios' });
@@ -45,6 +45,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'cardToken é obrigatório para pagamento com cartão' });
       }
       paymentData.token = cardToken;
+      paymentData.payment_method_id = paymentMethodId || 'visa';
       paymentData.installments = installments || 1;
       paymentData.payer = {
         email: order.customerEmail || 'cliente@santosanjos3d.com.br',
@@ -53,6 +54,7 @@ export default async function handler(req, res) {
           number: identification?.number?.replace(/\D/g, '') || order.customerDocument?.replace(/\D/g, '') || '00000000000',
         },
       };
+      console.log('[Payments CREATE] Card payment data:', JSON.stringify({ token: cardToken, paymentMethodId: paymentMethodId || 'visa', installments }));
     } else {
       return res.status(400).json({ error: 'paymentMethod deve ser "pix" ou "card"' });
     }

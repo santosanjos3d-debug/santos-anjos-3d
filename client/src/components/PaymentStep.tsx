@@ -127,21 +127,42 @@ export default function PaymentStep({
       }
 
       const mp = new window.MercadoPago(publicKey);
+      const cardNumber = cardData.cardNumber.replace(/\s/g, '');
+      const expMonth = parseInt(cardData.cardExpirationMonth);
+      const expYear = parseInt(`20${cardData.cardExpirationYear}`);
+
+      console.log('[CardToken] Creating token with:', {
+        cardNumber: cardNumber.substring(0, 6) + '...',
+        cardholderName: cardData.cardholderName,
+        securityCode: cardData.securityCode,
+        identificationNumber: cpf.replace(/\D/g, ''),
+        expirationMonth: expMonth,
+        expirationYear: expYear,
+      });
+
       const cardToken = await mp.createCardToken({
-        cardNumber: cardData.cardNumber.replace(/\s/g, ''),
+        cardNumber: cardNumber,
         cardholderName: cardData.cardholderName,
         securityCode: cardData.securityCode,
         identificationType: 'CPF',
         identificationNumber: cpf.replace(/\D/g, ''),
-        expirationMonth: parseInt(cardData.cardExpirationMonth),
-        expirationYear: parseInt(`20${cardData.cardExpirationYear}`),
+        expirationMonth: expMonth,
+        expirationYear: expYear,
       });
 
-      console.log('[CardToken]', cardToken);
+      console.log('[CardToken] Token created:', JSON.stringify(cardToken));
 
       if (!cardToken || !cardToken.id) {
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
+
+      // Detect card brand from number
+      let paymentMethodId = 'visa';
+      if (cardNumber.startsWith('5')) paymentMethodId = 'mastercard';
+      else if (cardNumber.startsWith('4')) paymentMethodId = 'visa';
+      else if (cardNumber.startsWith('3')) paymentMethodId = 'amex';
+      else if (cardNumber.startsWith('6')) paymentMethodId = 'elo';
+      console.log('[CardToken] Detected brand:', paymentMethodId);
 
       // Create payment with card token
       const res = await fetch('/api/payments/create', {
@@ -151,6 +172,7 @@ export default function PaymentStep({
           orderId,
           paymentMethod: 'card',
           cardToken: cardToken.id,
+          paymentMethodId: paymentMethodId,
           installments: cardData.installments,
           identification: {
             type: 'CPF',
