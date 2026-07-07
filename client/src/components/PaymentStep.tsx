@@ -121,7 +121,12 @@ export default function PaymentStep({
         throw new Error('SDK do Mercado Pago não carregado. Recarregue a página.');
       }
 
-      const mp = new window.MercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '');
+      const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+      if (!publicKey) {
+        throw new Error('Chave pública do Mercado Pago não configurada.');
+      }
+
+      const mp = new window.MercadoPago(publicKey);
       const cardToken = await mp.createCardToken({
         cardNumber: cardData.cardNumber.replace(/\s/g, ''),
         cardholderName: cardData.cardholderName,
@@ -132,8 +137,10 @@ export default function PaymentStep({
         expirationYear: parseInt(`20${cardData.cardExpirationYear}`),
       });
 
-      if (!cardToken?.id) {
-        throw new Error('Erro ao processar cartão. Verifique os dados.');
+      console.log('[CardToken]', cardToken);
+
+      if (!cardToken || !cardToken.id) {
+        throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
 
       // Create payment with card token
