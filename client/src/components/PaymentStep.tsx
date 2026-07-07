@@ -156,16 +156,24 @@ export default function PaymentStep({
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
 
-      // Lookup card brand from BIN via backend
-      const binRes = await fetch('/api/payments/create?action=binlookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bin: cardNumber.substring(0, 6) }),
-      });
-      const binData = await binRes.json();
-      console.log('[CardToken] BIN lookup result:', binData);
+      // Get payment method from token response or BIN lookup
+      let paymentMethodId = cardToken.payment_method?.id || null;
 
-      if (!binData.paymentMethodId) {
+      if (!paymentMethodId) {
+        // Fallback: lookup by BIN
+        const binRes = await fetch('/api/payments/create?action=binlookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bin: cardNumber.substring(0, 6) }),
+        });
+        const binData = await binRes.json();
+        console.log('[CardToken] BIN lookup result:', binData);
+        paymentMethodId = binData.paymentMethodId;
+      }
+
+      console.log('[CardToken] Final paymentMethodId:', paymentMethodId);
+
+      if (!paymentMethodId) {
         throw new Error('Bandeira do cartão não identificada. Verifique o número.');
       }
 
