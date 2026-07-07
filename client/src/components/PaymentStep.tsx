@@ -156,13 +156,18 @@ export default function PaymentStep({
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
 
-      // Detect card brand from number
-      let paymentMethodId = 'visa';
-      if (cardNumber.startsWith('5')) paymentMethodId = 'master';
-      else if (cardNumber.startsWith('4')) paymentMethodId = 'visa';
-      else if (cardNumber.startsWith('3')) paymentMethodId = 'amex';
-      else if (cardNumber.startsWith('6')) paymentMethodId = 'elo';
-      console.log('[CardToken] Detected brand:', paymentMethodId);
+      // Lookup card brand from BIN via backend
+      const binRes = await fetch('/api/payments/binlookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bin: cardNumber.substring(0, 6) }),
+      });
+      const binData = await binRes.json();
+      console.log('[CardToken] BIN lookup result:', binData);
+
+      if (!binData.paymentMethodId) {
+        throw new Error('Bandeira do cartão não identificada. Verifique o número.');
+      }
 
       // Create payment with card token
       const res = await fetch('/api/payments/create', {
@@ -172,7 +177,7 @@ export default function PaymentStep({
           orderId,
           paymentMethod: 'card',
           cardToken: cardToken.id,
-          paymentMethodId: paymentMethodId,
+          paymentMethodId: binData.paymentMethodId,
           installments: cardData.installments,
           identification: {
             type: 'CPF',
