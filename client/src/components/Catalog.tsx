@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import ProductModal from './ProductModal';
+import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 
 interface ProductColor {
   name: string;
@@ -307,6 +308,7 @@ export default function Catalog() {
 
   const [dbProducts, setDbProducts] = useState<Product[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { addItem } = useCartWithSync();
 
   useEffect(() => {
     fetch('/api/products')
@@ -339,6 +341,24 @@ export default function Catalog() {
     setIsModalOpen(true);
   };
 
+  const handleBuyClick = (product: Product) => {
+    const defaultSize = product.sizes?.[0];
+    const defaultColor = product.colors?.[0];
+    addItem({
+      productId: product.id,
+      productName: product.name,
+      productImage: defaultColor?.image || product.image,
+      color: (defaultColor?.name || 'Branco') as 'Branco' | 'Marrom' | 'Verde',
+      size: (defaultSize?.size || 'P') as 'P' | 'M' | 'G',
+      sizeLabel: defaultSize?.label || 'Pequeno',
+      price: defaultSize?.price || product.price,
+      quantity: 1,
+    });
+    setIsModalOpen(false);
+    setSelectedProduct(product);
+    setTimeout(() => setIsModalOpen(true), 100);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTimeout(() => setSelectedProduct(undefined), 300);
@@ -369,6 +389,7 @@ export default function Catalog() {
               image={product.image}
               description={product.description}
               price={product.price}
+              onBuyClick={() => handleBuyClick(product)}
               onDetailsClick={() => handleProductClick(product)}
             />
           ))}
