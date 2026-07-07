@@ -25,10 +25,10 @@ export default function ProductCard({
   onDetailsClick,
 }: ProductCardProps) {
   return (
-    <div className="group card-minimal overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+    <div className="group card-minimal overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 flex flex-col">
       {/* Image Container */}
       <div 
-        className="relative h-80 overflow-hidden bg-secondary cursor-pointer"
+        className="relative h-80 overflow-hidden bg-secondary cursor-pointer shrink-0"
         onClick={onDetailsClick}
       >
         <img
@@ -44,19 +44,19 @@ export default function ProductCard({
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-3">
-        <div>
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex-1">
           <h3 className="text-xl font-bold text-foreground mb-1">{name}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">{description || 'Estátua de arte sacra em impressão 3D de alta qualidade.'}</p>
         </div>
 
         {/* Price */}
-        <div className="pt-2 border-t border-border/50">
+        <div className="pt-2 border-t border-border/50 mt-3">
           <p className="text-lg font-bold text-accent">R$ {price.replace('.', ',')}</p>
         </div>
 
         {/* CTA Buttons */}
-        <div className="pt-2 space-y-2">
+        <div className="pt-3 space-y-2">
           <button 
             onClick={onBuyClick}
             className="w-full py-2 bg-accent text-background font-semibold hover:bg-accent/90 transition-colors duration-300 text-sm uppercase tracking-wide rounded"
