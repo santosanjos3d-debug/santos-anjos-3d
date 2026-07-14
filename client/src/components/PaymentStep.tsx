@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, CreditCard, QrCode, Copy, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
@@ -39,18 +39,61 @@ export default function PaymentStep({
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [cardError, setCardError] = useState<string | null>(null);
 
-  // Card form state
-  const [cardData, setCardData] = useState({
-    cardNumber: '',
-    cardholderName: '',
-    cardExpirationMonth: '',
-    cardExpirationYear: '',
-    securityCode: '',
-    installments: 1,
-  });
-
-  // CPF for card payment
+  // Card form state (non-PCI data only)
+  const [cardholderName, setCardholderName] = useState('');
+  const [installments, setInstallments] = useState(1);
   const [cpf, setCpf] = useState('');
+
+  const mpRef = useRef<any>(null);
+  const fieldInstances = useRef<any[]>([]);
+  const [mpReady, setMpReady] = useState(false);
+
+  // Initialize MercadoPago Secure Fields
+  useEffect(() => {
+    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+    if (!publicKey || !window.MercadoPago) return;
+
+    const mp = new window.MercadoPago(publicKey, { locale: 'pt-BR' });
+    mpRef.current = mp;
+
+    try {
+      const cardNumberField = mp.fields.create('cardNumber', {
+        placeholder: '0000 0000 0000 0000',
+        style: {
+          fontSize: '14px',
+          height: '38px',
+        },
+      });
+      const expirationField = mp.fields.create('expirationDate', {
+        placeholder: 'MM/AA',
+        style: {
+          fontSize: '14px',
+          height: '38px',
+        },
+      });
+      const securityCodeField = mp.fields.create('securityCode', {
+        placeholder: '000',
+        style: {
+          fontSize: '14px',
+          height: '38px',
+        },
+      });
+
+      cardNumberField.mount('cardNumber-container');
+      expirationField.mount('expirationDate-container');
+      securityCodeField.mount('securityCode-container');
+
+      fieldInstances.current = [cardNumberField, expirationField, securityCodeField];
+      setMpReady(true);
+    } catch (e) {
+      console.error('[SecureFields] Init error:', e);
+    }
+
+    return () => {
+      fieldInstances.current.forEach(f => f.unmount());
+      fieldInstances.current = [];
+    };
+  }, []);
 
   // Polling for PIX payment confirmation
   useEffect(() => {
@@ -107,48 +150,31 @@ export default function PaymentStep({
     setCardError(null);
 
     try {
-      if (!cardData.cardNumber || !cardData.cardholderName || !cardData.securityCode) {
-        throw new Error('Preencha todos os dados do cartão');
-      }
-
-      const expMonth = cardData.cardExpirationMonth.replace(/\D/g, '');
-      const expYear = cardData.cardExpirationYear.replace(/\D/g, '');
-
-      if (!expMonth || !expYear) {
-        throw new Error('Preencha a data de validade do cartão');
+      if (!cardholderName) {
+        throw new Error('Preencha o nome no cartão');
       }
 
       if (!cpf || cpf.replace(/\D/g, '').length !== 11) {
         throw new Error('CPF inválido');
       }
 
-      if (!window.MercadoPago) {
+      if (!mpRef.current) {
         throw new Error('SDK do Mercado Pago não carregado. Recarregue a página.');
       }
 
-      const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
-      if (!publicKey) {
-        throw new Error('Chave pública do Mercado Pago não configurada.');
-      }
+      const mp = mpRef.current;
 
-      const mp = new window.MercadoPago(publicKey);
-      const cardNumber = cardData.cardNumber.replace(/\s/g, '');
-
-      const cardToken = await mp.createCardToken({
-        cardNumber,
-        cardholderName: cardData.cardholderName,
-        securityCode: cardData.securityCode,
+      const cardToken = await mp.fields.createCardToken({
+        cardholderName: cardholderName.toUpperCase(),
         identificationType: 'CPF',
         identificationNumber: cpf.replace(/\D/g, ''),
-        cardExpirationMonth: expMonth,
-        cardExpirationYear: `20${expYear}`,
       });
 
       if (!cardToken || !cardToken.id) {
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
 
-      const bin = cardToken.first_six_digits || cardNumber.substring(0, 6);
+      const bin = cardToken.first_six_digits;
 
       const res = await fetch('/api/payments/create', {
         method: 'POST',
@@ -158,7 +184,7 @@ export default function PaymentStep({
           paymentMethod: 'card',
           cardToken: cardToken.id,
           bin,
-          installments: cardData.installments,
+          installments,
           identification: {
             type: 'CPF',
             number: cpf.replace(/\D/g, ''),
@@ -185,7 +211,7 @@ export default function PaymentStep({
     } finally {
       setLoading(false);
     }
-  }, [orderId, cardData, cpf, onSuccess, onError]);
+  }, [orderId, cardholderName, installments, cpf, onSuccess, onError]);
 
   const handleCopyPix = () => {
     if (pixData?.copyPaste) {
@@ -193,12 +219,6 @@ export default function PaymentStep({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  };
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s/g, '').replace(/\D/g, '');
-    const matches = v.match(/.{1,4}/g);
-    return matches ? matches.join(' ') : '';
   };
 
   const formatCPF = (value: string) => {
@@ -339,60 +359,32 @@ export default function PaymentStep({
             />
           </div>
 
-          {/* Card Number */}
+          {/* Card Number (Secure Field) */}
           <div>
             <label className="block text-xs font-medium mb-1 text-gray-600">Número do cartão *</label>
-            <Input
-              value={cardData.cardNumber}
-              onChange={e => setCardData({ ...cardData, cardNumber: formatCardNumber(e.target.value) })}
-              placeholder="0000 0000 0000 0000"
-              maxLength={19}
-              required
-            />
+            <div id="cardNumber-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
           </div>
 
           {/* Cardholder Name */}
           <div>
             <label className="block text-xs font-medium mb-1 text-gray-600">Nome no cartão *</label>
             <Input
-              value={cardData.cardholderName}
-              onChange={e => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })}
+              value={cardholderName}
+              onChange={e => setCardholderName(e.target.value.toUpperCase())}
               placeholder="NOME COMO ESTÁ NO CARTÃO"
               required
             />
           </div>
 
-          {/* Expiry + CVV */}
+          {/* Expiry (Secure Field) + CVV (Secure Field) */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1 text-gray-600">Validade *</label>
-              <div className="flex gap-2">
-                <Input
-                  value={cardData.cardExpirationMonth}
-                  onChange={e => setCardData({ ...cardData, cardExpirationMonth: e.target.value.replace(/\D/g, '') })}
-                  placeholder="MM"
-                  maxLength={2}
-                  required
-                />
-                <Input
-                  value={cardData.cardExpirationYear}
-                  onChange={e => setCardData({ ...cardData, cardExpirationYear: e.target.value.replace(/\D/g, '') })}
-                  placeholder="AA"
-                  maxLength={2}
-                  required
-                />
-              </div>
+              <div id="expirationDate-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
             </div>
             <div>
               <label className="block text-xs font-medium mb-1 text-gray-600">CVV *</label>
-              <Input
-                value={cardData.securityCode}
-                onChange={e => setCardData({ ...cardData, securityCode: e.target.value.replace(/\D/g, '') })}
-                placeholder="000"
-                maxLength={4}
-                type="password"
-                required
-              />
+              <div id="securityCode-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
             </div>
           </div>
 
@@ -400,8 +392,8 @@ export default function PaymentStep({
           <div>
             <label className="block text-xs font-medium mb-1 text-gray-600">Parcelas</label>
             <select
-              value={cardData.installments}
-              onChange={e => setCardData({ ...cardData, installments: parseInt(e.target.value) })}
+              value={installments}
+              onChange={e => setInstallments(parseInt(e.target.value))}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => (
@@ -411,6 +403,14 @@ export default function PaymentStep({
               ))}
             </select>
           </div>
+
+          {/* Not ready warning */}
+          {!mpReady && (
+            <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg text-sm">
+              <Clock size={16} />
+              Campos do cartão estão sendo carregados...
+            </div>
+          )}
 
           {/* Error */}
           {cardError && (
@@ -423,7 +423,7 @@ export default function PaymentStep({
           {/* Submit */}
           <Button
             onClick={handleCreateCardPayment}
-            disabled={loading}
+            disabled={loading || !mpReady}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >
             {loading ? (
