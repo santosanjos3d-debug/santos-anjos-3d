@@ -48,52 +48,52 @@ export default function PaymentStep({
   const fieldInstances = useRef<any[]>([]);
   const [mpReady, setMpReady] = useState(false);
 
-  // Initialize MercadoPago Secure Fields
+  // Initialize Secure Fields when user selects card payment
   useEffect(() => {
+    if (paymentMethod !== 'card' || mpRef.current) return;
+
     const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
-    if (!publicKey || !window.MercadoPago) return;
+    if (!publicKey || !window.MercadoPago) {
+      console.warn('[SecureFields] SDK not available');
+      return;
+    }
 
     const mp = new window.MercadoPago(publicKey, { locale: 'pt-BR' });
     mpRef.current = mp;
 
-    try {
-      const cardNumberField = mp.fields.create('cardNumber', {
-        placeholder: '0000 0000 0000 0000',
-        style: {
-          fontSize: '14px',
-          height: '38px',
-        },
-      });
-      const expirationField = mp.fields.create('expirationDate', {
-        placeholder: 'MM/AA',
-        style: {
-          fontSize: '14px',
-          height: '38px',
-        },
-      });
-      const securityCodeField = mp.fields.create('securityCode', {
-        placeholder: '000',
-        style: {
-          fontSize: '14px',
-          height: '38px',
-        },
-      });
+    requestAnimationFrame(() => {
+      try {
+        const cardNumberField = mp.fields.create('cardNumber', {
+          placeholder: '0000 0000 0000 0000',
+          style: { fontSize: '14px', height: '38px' },
+        });
+        const expirationField = mp.fields.create('expirationDate', {
+          placeholder: 'MM/AA',
+          style: { fontSize: '14px', height: '38px' },
+        });
+        const securityCodeField = mp.fields.create('securityCode', {
+          placeholder: '000',
+          style: { fontSize: '14px', height: '38px' },
+        });
 
-      cardNumberField.mount('cardNumber-container');
-      expirationField.mount('expirationDate-container');
-      securityCodeField.mount('securityCode-container');
+        cardNumberField.mount('cardNumber-container');
+        expirationField.mount('expirationDate-container');
+        securityCodeField.mount('securityCode-container');
 
-      fieldInstances.current = [cardNumberField, expirationField, securityCodeField];
-      setMpReady(true);
-    } catch (e) {
-      console.error('[SecureFields] Init error:', e);
-    }
+        fieldInstances.current = [cardNumberField, expirationField, securityCodeField];
+        setMpReady(true);
+      } catch (e) {
+        console.error('[SecureFields] Init error:', e);
+      }
+    });
 
     return () => {
       fieldInstances.current.forEach(f => f.unmount());
       fieldInstances.current = [];
+      mpRef.current = null;
+      setMpReady(false);
     };
-  }, []);
+  }, [paymentMethod]);
 
   // Polling for PIX payment confirmation
   useEffect(() => {
