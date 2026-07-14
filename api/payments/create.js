@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   try {
     await runMigration();
 
-    const { orderId, paymentMethod, cardToken, paymentMethodId, installments, identification } = req.body || {};
+    const { orderId, paymentMethod, cardToken, paymentMethodId, installments, identification, issuerId } = req.body || {};
 
     if (!orderId || !paymentMethod) {
       return res.status(400).json({ error: 'orderId e paymentMethod são obrigatórios' });
@@ -72,6 +72,7 @@ export default async function handler(req, res) {
       paymentData.token = cardToken;
       paymentData.payment_method_id = paymentMethodId || 'visa';
       paymentData.installments = installments || 1;
+      if (issuerId) paymentData.issuer_id = issuerId;
       paymentData.payer = {
         email: order.customerEmail || 'cliente@santosanjos3d.com.br',
         identification: {

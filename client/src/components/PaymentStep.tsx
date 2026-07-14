@@ -150,36 +150,24 @@ export default function PaymentStep({
         expirationYear: expYear,
       });
 
-      console.log('[CardToken] Token created:', JSON.stringify(cardToken));
-      console.log('[CardToken] Token keys:', Object.keys(cardToken));
-      console.log('[CardToken] payment_method:', JSON.stringify(cardToken.payment_method));
-
       if (!cardToken || !cardToken.id) {
         throw new Error('Erro ao processar cartão. Verifique os dados e tente novamente.');
       }
 
-      // Get payment method from token response or BIN lookup
-      let paymentMethodId = cardToken.payment_method?.id || null;
+      const bin = cardToken.first_six_digits || cardNumber.substring(0, 6);
 
-      if (!paymentMethodId) {
-        // Fallback: lookup by BIN
-        const binRes = await fetch('/api/payments/create?action=binlookup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bin: cardNumber.substring(0, 6) }),
-        });
-        const binData = await binRes.json();
-        console.log('[CardToken] BIN lookup result:', binData);
-        paymentMethodId = binData.paymentMethodId;
+      const paymentMethods = await mp.getPaymentMethods({ bin });
+      if (!paymentMethods?.results?.length) {
+        throw new Error('Bandeira do cartão não identificada. Verifique o número do cartão.');
       }
 
-      console.log('[CardToken] Final paymentMethodId:', paymentMethodId);
+      const cardMethod = paymentMethods.results.find(
+        m => m.payment_type_id === 'credit_card'
+      ) || paymentMethods.results[0];
 
-      if (!paymentMethodId) {
-        throw new Error('Bandeira do cartão não identificada. Verifique o número.');
-      }
+      const paymentMethodId = cardMethod.id;
+      const issuerId = cardMethod.issuer?.id;
 
-      // Create payment with card token
       const res = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -187,7 +175,8 @@ export default function PaymentStep({
           orderId,
           paymentMethod: 'card',
           cardToken: cardToken.id,
-          paymentMethodId: binData.paymentMethodId,
+          paymentMethodId,
+          issuerId,
           installments: cardData.installments,
           identification: {
             type: 'CPF',
