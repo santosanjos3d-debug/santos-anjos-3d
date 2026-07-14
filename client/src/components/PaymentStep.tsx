@@ -150,7 +150,7 @@ export default function PaymentStep({
 
       const bin = cardToken.first_six_digits || cardNumber.substring(0, 6);
 
-      const res = await fetch('/api/payments/create?action=card', {
+      const res = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
