@@ -15,15 +15,36 @@ export default async function handler(req, res) {
       if (!bin || bin.length < 6) {
         return res.status(400).json({ error: 'BIN deve ter pelo menos 6 dígitos' });
       }
-      const result = await fetch(`https://api.mercadopago.com/v1/payment_methods/search?bin=${bin}`, {
-        headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
-      }).then(r => r.json());
-      console.log('[BIN Lookup] Full result:', JSON.stringify(result));
-      if (result.results && result.results.length > 0) {
-        const creditCard = result.results.find(m => m.payment_type_id === 'credit_card') || result.results[0];
-        console.log('[BIN Lookup] Selected:', creditCard.id, creditCard.payment_type_id, creditCard.name);
-        return res.status(200).json({ paymentMethodId: creditCard.id, name: creditCard.name, thumbnail: creditCard.thumbnail, paymentTypeId: creditCard.payment_type_id, issuerId: creditCard.issuer?.id });
+
+      let paymentMethodId = null;
+      let issuerId = null;
+
+      try {
+        const result = await fetch(`https://api.mercadopago.com/v1/payment_methods/search?bin=${bin}`, {
+          headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
+        }).then(r => r.json());
+        console.log('[BIN Lookup] API result:', JSON.stringify(result));
+        if (result.results && result.results.length > 0) {
+          const cardMethod = result.results.find(m => m.payment_type_id === 'credit_card') || result.results[0];
+          paymentMethodId = cardMethod.id;
+          issuerId = cardMethod.issuer?.id;
+          return res.status(200).json({ paymentMethodId, issuerId, name: cardMethod.name, thumbnail: cardMethod.thumbnail, paymentTypeId: cardMethod.payment_type_id });
+        }
+      } catch (e) {
+        console.warn('[BIN Lookup] API call failed, using fallback:', e.message);
       }
+
+      const firstDigit = bin.charAt(0);
+      if (firstDigit === '4') paymentMethodId = 'visa';
+      else if (firstDigit === '5' || firstDigit === '2') paymentMethodId = 'master';
+      else if (firstDigit === '3') paymentMethodId = 'amex';
+      else if (firstDigit === '6') paymentMethodId = 'elo';
+
+      if (paymentMethodId) {
+        console.log('[BIN Lookup] Fallback resolved:', { bin, paymentMethodId });
+        return res.status(200).json({ paymentMethodId, issuerId });
+      }
+
       return res.status(404).json({ error: 'Bandeira não encontrada' });
     } catch (err) {
       console.error('[BIN Lookup]', err);
