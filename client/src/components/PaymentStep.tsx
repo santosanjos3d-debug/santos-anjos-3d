@@ -140,8 +140,8 @@ export default function PaymentStep({
         securityCode: cardData.securityCode,
         identificationType: 'CPF',
         identificationNumber: cpf.replace(/\D/g, ''),
-        expirationMonth: parseInt(expMonth),
-        expirationYear: parseInt(`20${expYear}`),
+        cardExpirationMonth: expMonth,
+        cardExpirationYear: `20${expYear}`,
       });
 
       if (!cardToken || !cardToken.id) {
