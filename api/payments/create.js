@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       if (result.results && result.results.length > 0) {
         const creditCard = result.results.find(m => m.payment_type_id === 'credit_card') || result.results[0];
         console.log('[BIN Lookup] Selected:', creditCard.id, creditCard.payment_type_id, creditCard.name);
-        return res.status(200).json({ paymentMethodId: creditCard.id, name: creditCard.name, thumbnail: creditCard.thumbnail, paymentTypeId: creditCard.payment_type_id });
+        return res.status(200).json({ paymentMethodId: creditCard.id, name: creditCard.name, thumbnail: creditCard.thumbnail, paymentTypeId: creditCard.payment_type_id, issuerId: creditCard.issuer?.id });
       }
       return res.status(404).json({ error: 'Bandeira não encontrada' });
     } catch (err) {

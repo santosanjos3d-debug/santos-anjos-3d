@@ -156,17 +156,19 @@ export default function PaymentStep({
 
       const bin = cardToken.first_six_digits || cardNumber.substring(0, 6);
 
-      const paymentMethods = await mp.getPaymentMethods({ bin });
-      if (!paymentMethods?.results?.length) {
+      const binRes = await fetch('/api/payments/create?action=binlookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bin }),
+      });
+
+      if (!binRes.ok) {
         throw new Error('Bandeira do cartão não identificada. Verifique o número do cartão.');
       }
 
-      const cardMethod = paymentMethods.results.find(
-        m => m.payment_type_id === 'credit_card'
-      ) || paymentMethods.results[0];
-
-      const paymentMethodId = cardMethod.id;
-      const issuerId = cardMethod.issuer?.id;
+      const binData = await binRes.json();
+      const paymentMethodId = binData.paymentMethodId;
+      const issuerId = binData.issuerId;
 
       const res = await fetch('/api/payments/create', {
         method: 'POST',
