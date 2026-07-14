@@ -7,57 +7,13 @@ export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // BIN Lookup action
   const action = req.query?.action;
-  if (action === 'binlookup' && req.method === 'POST') {
-    try {
-      const { bin } = req.body || {};
-      if (!bin || bin.length < 6) {
-        return res.status(400).json({ error: 'BIN deve ter pelo menos 6 dígitos' });
-      }
-
-      let paymentMethodId = null;
-      let issuerId = null;
-
-      try {
-        const result = await fetch(`https://api.mercadopago.com/v1/payment_methods/search?bin=${bin}`, {
-          headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
-        }).then(r => r.json());
-        console.log('[BIN Lookup] API result:', JSON.stringify(result));
-        if (result.results && result.results.length > 0) {
-          const cardMethod = result.results.find(m => m.payment_type_id === 'credit_card') || result.results[0];
-          paymentMethodId = cardMethod.id;
-          issuerId = cardMethod.issuer?.id;
-          return res.status(200).json({ paymentMethodId, issuerId, name: cardMethod.name, thumbnail: cardMethod.thumbnail, paymentTypeId: cardMethod.payment_type_id });
-        }
-      } catch (e) {
-        console.warn('[BIN Lookup] API call failed, using fallback:', e.message);
-      }
-
-      const firstDigit = bin.charAt(0);
-      if (firstDigit === '4') paymentMethodId = 'visa';
-      else if (firstDigit === '5' || firstDigit === '2') paymentMethodId = 'master';
-      else if (firstDigit === '3') paymentMethodId = 'amex';
-      else if (firstDigit === '6') paymentMethodId = 'elo';
-
-      if (paymentMethodId) {
-        console.log('[BIN Lookup] Fallback resolved:', { bin, paymentMethodId });
-        return res.status(200).json({ paymentMethodId, issuerId });
-      }
-
-      return res.status(404).json({ error: 'Bandeira não encontrada' });
-    } catch (err) {
-      console.error('[BIN Lookup]', err);
-      return res.status(500).json({ error: 'Erro ao consultar BIN' });
-    }
-  }
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     await runMigration();
 
-    const { orderId, paymentMethod, cardToken, paymentMethodId, installments, identification, issuerId } = req.body || {};
+    const { orderId, paymentMethod, cardToken, installments, identification, bin } = req.body || {};
 
     if (!orderId || !paymentMethod) {
       return res.status(400).json({ error: 'orderId e paymentMethod são obrigatórios' });
@@ -90,8 +46,36 @@ export default async function handler(req, res) {
       if (!cardToken) {
         return res.status(400).json({ error: 'cardToken é obrigatório para pagamento com cartão' });
       }
+
+      let paymentMethodId = null;
+      let issuerId = null;
+
+      if (bin && bin.length >= 6) {
+        try {
+          const pmResult = await fetch(`https://api.mercadopago.com/v1/payment_methods/search?bin=${bin}`, {
+            headers: { 'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
+          }).then(r => r.json());
+          if (pmResult.results && pmResult.results.length > 0) {
+            const cardMethod = pmResult.results.find(m => m.payment_type_id === 'credit_card') || pmResult.results[0];
+            paymentMethodId = cardMethod.id;
+            issuerId = cardMethod.issuer?.id;
+          }
+        } catch (e) {
+          console.warn('[Payments] BIN API failed:', e.message);
+        }
+      }
+
+      if (!paymentMethodId) {
+        const d = bin?.charAt(0);
+        if (d === '4') paymentMethodId = 'visa';
+        else if (d === '5' || d === '2') paymentMethodId = 'master';
+        else if (d === '3') paymentMethodId = 'amex';
+        else if (d === '6') paymentMethodId = 'elo';
+        else paymentMethodId = 'visa';
+      }
+
       paymentData.token = cardToken;
-      paymentData.payment_method_id = paymentMethodId || 'visa';
+      paymentData.payment_method_id = paymentMethodId;
       paymentData.installments = installments || 1;
       if (issuerId) paymentData.issuer_id = issuerId;
       paymentData.payer = {
@@ -101,7 +85,7 @@ export default async function handler(req, res) {
           number: identification?.number?.replace(/\D/g, '') || order.customerDocument?.replace(/\D/g, '') || '00000000000',
         },
       };
-      console.log('[Payments CREATE] Card payment data:', JSON.stringify({ token: cardToken, paymentMethodId: paymentMethodId || 'visa', installments }));
+      console.log('[Payments] Card payment:', JSON.stringify({ paymentMethodId, issuerId, installments }));
     } else {
       return res.status(400).json({ error: 'paymentMethod deve ser "pix" ou "card"' });
     }

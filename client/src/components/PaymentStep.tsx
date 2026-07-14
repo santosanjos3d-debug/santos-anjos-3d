@@ -107,16 +107,21 @@ export default function PaymentStep({
     setCardError(null);
 
     try {
-      // Validate card data
       if (!cardData.cardNumber || !cardData.cardholderName || !cardData.securityCode) {
         throw new Error('Preencha todos os dados do cartão');
+      }
+
+      const expMonth = cardData.cardExpirationMonth.replace(/\D/g, '');
+      const expYear = cardData.cardExpirationYear.replace(/\D/g, '');
+
+      if (!expMonth || !expYear) {
+        throw new Error('Preencha a data de validade do cartão');
       }
 
       if (!cpf || cpf.replace(/\D/g, '').length !== 11) {
         throw new Error('CPF inválido');
       }
 
-      // Tokenize card using MercadoPago SDK
       if (!window.MercadoPago) {
         throw new Error('SDK do Mercado Pago não carregado. Recarregue a página.');
       }
@@ -128,26 +133,15 @@ export default function PaymentStep({
 
       const mp = new window.MercadoPago(publicKey);
       const cardNumber = cardData.cardNumber.replace(/\s/g, '');
-      const expMonth = parseInt(cardData.cardExpirationMonth);
-      const expYear = parseInt(`20${cardData.cardExpirationYear}`);
-
-      console.log('[CardToken] Creating token with:', {
-        cardNumber: cardNumber.substring(0, 6) + '...',
-        cardholderName: cardData.cardholderName,
-        securityCode: cardData.securityCode,
-        identificationNumber: cpf.replace(/\D/g, ''),
-        expirationMonth: expMonth,
-        expirationYear: expYear,
-      });
 
       const cardToken = await mp.createCardToken({
-        cardNumber: cardNumber,
+        cardNumber,
         cardholderName: cardData.cardholderName,
         securityCode: cardData.securityCode,
         identificationType: 'CPF',
         identificationNumber: cpf.replace(/\D/g, ''),
-        expirationMonth: expMonth,
-        expirationYear: expYear,
+        expirationMonth: parseInt(expMonth),
+        expirationYear: parseInt(`20${expYear}`),
       });
 
       if (!cardToken || !cardToken.id) {
@@ -156,29 +150,14 @@ export default function PaymentStep({
 
       const bin = cardToken.first_six_digits || cardNumber.substring(0, 6);
 
-      const binRes = await fetch('/api/payments/create?action=binlookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bin }),
-      });
-
-      if (!binRes.ok) {
-        throw new Error('Bandeira do cartão não identificada. Verifique o número do cartão.');
-      }
-
-      const binData = await binRes.json();
-      const paymentMethodId = binData.paymentMethodId;
-      const issuerId = binData.issuerId;
-
-      const res = await fetch('/api/payments/create', {
+      const res = await fetch('/api/payments/create?action=card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId,
           paymentMethod: 'card',
           cardToken: cardToken.id,
-          paymentMethodId,
-          issuerId,
+          bin,
           installments: cardData.installments,
           identification: {
             type: 'CPF',
