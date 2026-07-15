@@ -154,7 +154,7 @@ export default function ShippingCalculatorSimple({ cep, cartItems, onShippingCal
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-gray-900">
-                {service.currency} {parseFloat(service.price).toFixed(2)}
+                R$ {parseFloat(service.price).toFixed(2).replace('.', ',')}
               </div>
             </div>
           </div>
