@@ -99,7 +99,7 @@ export default function Cart() {
                         <div className="flex-1">
                           <p className="font-semibold">{item.productName}</p>
                           <p className="text-sm text-gray-600">{item.color} • {item.sizeLabel}</p>
-                          <p className="text-sm font-medium mt-2">{item.price}</p>
+                          <p className="text-sm font-medium mt-2">R$ {parseFloat(item.price).toFixed(2).replace('.', ',')}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:bg-gray-100 rounded">
