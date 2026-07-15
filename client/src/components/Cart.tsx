@@ -1,7 +1,7 @@
 import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ShippingCalculatorSimple from './ShippingCalculatorSimple';
 import CheckoutModal from './CheckoutModal';
 
@@ -20,6 +20,13 @@ export default function Cart() {
   const [shippingCost, setShippingCost] = useState(0);
   const [shippingService, setShippingService] = useState<ShippingOption | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
+
+  // Listen for external open-cart event
+  useEffect(() => {
+    const handler = () => setIsOpen(true);
+    window.addEventListener('open-cart', handler);
+    return () => window.removeEventListener('open-cart', handler);
+  }, []);
 
   const formatCEP = (value: string) => {
     const cleaned = value.replace(/\D/g, '');

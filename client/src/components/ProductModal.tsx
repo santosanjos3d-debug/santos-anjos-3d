@@ -170,7 +170,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
           </div>
 
           {/* Add to Cart */}
-          <div className="border-t border-border/50 pt-6">
+          <div className="border-t border-border/50 pt-6 space-y-3">
             <button
               onClick={handleAddToCart}
               className={`w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
@@ -182,6 +182,15 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
               <ShoppingCart size={20} />
               {addedToCart ? 'Adicionado ao Carrinho!' : 'Adicionar ao Carrinho'}
             </button>
+            {addedToCart && (
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-cart'))}
+                className="w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 bg-amber-500 text-white hover:bg-amber-600 flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={20} />
+                Ir para o Carrinho
+              </button>
+            )}
           </div>
         </div>
       </div>
