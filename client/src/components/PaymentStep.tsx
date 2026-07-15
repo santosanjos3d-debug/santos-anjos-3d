@@ -65,15 +65,15 @@ export default function PaymentStep({
       try {
         const cardNumberField = mp.fields.create('cardNumber', {
           placeholder: '0000 0000 0000 0000',
-          style: { fontSize: '14px', height: '38px' },
+          style: { fontSize: '14px', height: '38px', paddingLeft: '12px', paddingRight: '12px' },
         });
         const expirationField = mp.fields.create('expirationDate', {
           placeholder: 'MM/AA',
-          style: { fontSize: '14px', height: '38px' },
+          style: { fontSize: '14px', height: '38px', paddingLeft: '12px', paddingRight: '12px' },
         });
         const securityCodeField = mp.fields.create('securityCode', {
           placeholder: '000',
-          style: { fontSize: '14px', height: '38px' },
+          style: { fontSize: '14px', height: '38px', paddingLeft: '12px', paddingRight: '12px' },
         });
 
         cardNumberField.mount('cardNumber-container');
@@ -362,7 +362,7 @@ export default function PaymentStep({
           {/* Card Number (Secure Field) */}
           <div>
             <label className="block text-xs font-medium mb-1 text-gray-600">Número do cartão *</label>
-            <div id="cardNumber-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
+            <div id="cardNumber-container" className="w-full h-10 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden"></div>
           </div>
 
           {/* Cardholder Name */}
@@ -380,11 +380,11 @@ export default function PaymentStep({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1 text-gray-600">Validade *</label>
-              <div id="expirationDate-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
+              <div id="expirationDate-container" className="w-full h-10 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden"></div>
             </div>
             <div>
               <label className="block text-xs font-medium mb-1 text-gray-600">CVV *</label>
-              <div id="securityCode-container" className="w-full h-10 px-3 py-2 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500"></div>
+              <div id="securityCode-container" className="w-full h-10 border rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden"></div>
             </div>
           </div>
 
