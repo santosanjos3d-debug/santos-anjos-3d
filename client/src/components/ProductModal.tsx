@@ -42,8 +42,11 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
   const { addItem } = useCartWithSync();
   const [addedToCart, setAddedToCart] = useState(false);
+  const [showCartLink, setShowCartLink] = useState(false);
 
+  // Reset when product changes
   if (!isOpen || !product) return null;
+  if (product && showCartLink) setShowCartLink(false);
 
   const currentColor = product.colors?.find(c => c.value === selectedColor);
   const currentSize = product.sizes?.find(s => s.size === selectedSize);
@@ -72,6 +75,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
       quantity: 1,
     });
     setAddedToCart(true);
+    setShowCartLink(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
@@ -182,7 +186,7 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
               <ShoppingCart size={20} />
               {addedToCart ? 'Adicionado ao Carrinho!' : 'Adicionar ao Carrinho'}
             </button>
-            {addedToCart && (
+            {showCartLink && (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-cart'))}
                 className="w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 bg-amber-500 text-white hover:bg-amber-600 flex items-center justify-center gap-2"
