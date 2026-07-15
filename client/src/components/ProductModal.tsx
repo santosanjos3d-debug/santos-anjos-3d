@@ -3,7 +3,7 @@
  * Design: Minimalismo Sagrado - Modal com imagem grande, seletor de cores, tamanhos com preço dinâmico e CTA WhatsApp destacado
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { X, ShoppingCart } from 'lucide-react';
 import { useCartWithSync } from '@/_core/hooks/useCartWithSync';
 
@@ -43,10 +43,15 @@ export default function ProductModal({ isOpen, product, onClose }: ProductModalP
   const { addItem } = useCartWithSync();
   const [addedToCart, setAddedToCart] = useState(false);
   const [showCartLink, setShowCartLink] = useState(false);
+  const prevProductId = useRef<number | null>(null);
 
   // Reset when product changes
+  if (product && prevProductId.current !== null && prevProductId.current !== product.id) {
+    setShowCartLink(false);
+  }
+  if (product) prevProductId.current = product.id;
+
   if (!isOpen || !product) return null;
-  if (product && showCartLink) setShowCartLink(false);
 
   const currentColor = product.colors?.find(c => c.value === selectedColor);
   const currentSize = product.sizes?.find(s => s.size === selectedSize);
