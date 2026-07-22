@@ -101,7 +101,8 @@ export default function Admin() {
         method: 'DELETE',
         credentials: 'include',
       });
-      if (!res.ok) throw new Error('Erro ao excluir pedido');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.details || data.error || 'Erro ao excluir pedido');
       fetchOrders();
     } catch (err: any) {
       alert('Erro ao excluir pedido: ' + (err.message || 'Tente novamente.'));

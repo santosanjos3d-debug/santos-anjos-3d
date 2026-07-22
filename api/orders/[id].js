@@ -48,11 +48,13 @@ export default async function handler(req, res) {
     if (!ok) return;
 
     try {
-      await query('DELETE FROM orders WHERE id = ?', [id]);
+      console.log('[Orders DELETE] Attempting to delete order id:', id);
+      const result = await query('DELETE FROM orders WHERE id = ?', [id]);
+      console.log('[Orders DELETE] Result:', JSON.stringify(result));
       return res.status(200).json({ success: true });
     } catch (err) {
-      console.error('[Orders DELETE]', err);
-      return res.status(500).json({ error: 'Erro ao excluir pedido' });
+      console.error('[Orders DELETE] Error:', err.message || err);
+      return res.status(500).json({ error: 'Erro ao excluir pedido', details: err.message || String(err) });
     }
   }
 
